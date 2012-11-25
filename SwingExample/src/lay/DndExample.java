@@ -5,24 +5,29 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
@@ -30,128 +35,142 @@ import javax.swing.TransferHandler;
  * User: mgarin Date: 18.04.11 Time: 13:05
  */
 
-public class DndExample {
+public class DndExample/* implements MouseListener */{
 	static final String panel1 = "panel1";
 
-	static Dimension phase = null;
-	private static BufferedImage dragged = null;
+	static Dimension phase;
+	private BufferedImage dragged;
 
-	public static void main(String[] args) {
-//		try {
-//			// Устанавливаем нативный стиль компонентов
-//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		} catch (Throwable e) {
-//			//
-//		}
+	private final JLabel label = new JLabel("Drag me somewhere!", SwingConstants.CENTER);
+	private final JButton button = new JButton("Some custom button");
+
+	public DndExample() {
+		// try {
+		// // Устанавливаем нативный стиль компонентов
+		// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		// } catch (Throwable e) {
+		// //
+		// }
 
 		final JFrame frame = new JFrame();
 
-		frame.getRootPane().setOpaque(true);
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.getContentPane().setBackground(Color.red);
+		// frame.getContentPane().setLayout(new BorderLayout());
+		// frame.getContentPane().setBackground(Color.red);
 
 		// Контейнер в котором будет происходить ДнД
-		final JPanel dragContainer = new JPanel();
-		dragContainer.setOpaque(false);
-		dragContainer.setLayout(null);
+		final DragContainer dragContainer = new DragContainer();
+		// dragContainer.setOpaque(false);
+		// dragContainer.setLayout(null);
 		frame.getContentPane().add(dragContainer, BorderLayout.CENTER);
-		dragContainer.setBackground(Color.magenta);
+
+		dragContainer.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.weightx = 1;
+
+		dragContainer.add(new Section("Section 1", Color.yellow), gbc);
+		dragContainer.add(new Section("Section 2", Color.green), gbc);
+		dragContainer.add(new Section("Section 3", Color.blue), gbc);
+
+		gbc.weighty = 1;
+
+		dragContainer.add(Box.createVerticalGlue(), gbc);
 
 		// Перетаскиваемая панель
 		final JPanel panel = new JPanel();
+
+		// dragContainer.add(panel);
+
+		final TransferHandlerDecorator transferHandle = new TransferHandlerDecorator(panel);
+
 		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
 				BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 		panel.setLayout(new BorderLayout(4, 4));
-		panel.add(new JLabel("Drag me somewhere!", JLabel.CENTER) {
-			{
-				setTransferHandler(new TransferHandler() {
-					public int getSourceActions(JComponent c) {
-						return TransferHandler.MOVE;
-					}
 
-					public boolean canImport(TransferSupport support) {
-						// Для "прозрачности" панели при сбросе ДнД
-						// Позволяет располагать панель даже когда курсор не над dragContainer'ом
-						return dragContainer.getTransferHandler().canImport(support);
-					}
+		panel.add(label, BorderLayout.CENTER);
+		panel.add(button, BorderLayout.SOUTH);
 
-					public boolean importData(TransferSupport support) {
-						// Для "прозрачности" панели при сбросе ДнД
-						// Позволяет располагать панель даже когда курсор не над dragContainer'ом
-						return dragContainer.getTransferHandler().importData(support);
-					}
+		label.setTransferHandler(new TransferHandler() {
+			public int getSourceActions(JComponent c) {
+				return TransferHandler.MOVE;
+			}
 
-					protected Transferable createTransferable(JComponent c) {
-						return new StringSelection(panel1);
-					}
-				});
-				addMouseListener(new MouseAdapter() {
-					public void mousePressed(MouseEvent e) {
-						if (SwingUtilities.isLeftMouseButton(e)) {
-							// Для корректной вставки панели позднее
-							Point los = panel.getLocationOnScreen();
-							phase = new Dimension(e.getLocationOnScreen().x - los.x, e.getLocationOnScreen().y - los.y);
+			public boolean canImport(TransferSupport support) {
+				// Для "прозрачности" панели при сбросе ДнД
+				// Позволяет располагать панель даже когда курсор не над dragContainer'ом
+				return transferHandle.canImport(support);
+			}
 
-							// Для отрисовки перетаскиваемого образа
-							dragged = new BufferedImage(panel.getWidth(), panel.getHeight(),
-									BufferedImage.TYPE_INT_ARGB);
-							Graphics2D g2d = dragged.createGraphics();
-							g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-							panel.paintAll(g2d);
-							g2d.dispose();
+			public boolean importData(TransferSupport support) {
+				// Для "прозрачности" панели при сбросе ДнД
+				// Позволяет располагать панель даже когда курсор не над dragContainer'ом
+				return transferHandle.importData(support);
+			}
 
-							JComponent c = (JComponent)e.getSource();
-							TransferHandler handler = c.getTransferHandler();
-							handler.exportAsDrag(c, e, TransferHandler.MOVE);
-						}
-					}
-				});
+			protected Transferable createTransferable(JComponent c) {
+				return new StringSelection(panel1);
 			}
 		});
 
-		panel.add(new JButton("Some custom button"), BorderLayout.SOUTH);
+		label.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (SwingUtilities.isLeftMouseButton(e)) {
+					// Для корректной вставки панели позднее
+					Point point = panel.getLocationOnScreen();
+					phase = new Dimension(e.getLocationOnScreen().x - point.x, e.getLocationOnScreen().y - point.y);
+
+					// Для отрисовки перетаскиваемого образа
+					dragged = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					Graphics2D g2d = dragged.createGraphics();
+					g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+					panel.paintAll(g2d);
+					g2d.dispose();
+
+					JComponent c = (JComponent)e.getSource();
+					TransferHandler handler = c.getTransferHandler();
+					handler.exportAsDrag(c, e, TransferHandler.MOVE);
+				}
+			}
+		});
+
 		panel.setBounds(25, 25, 200, 100);
 		panel.setBackground(Color.yellow);
-		dragContainer.add(panel);
 
 		// Слушатель для корректного расположния панели при её сбросе
-		dragContainer.setTransferHandler(new TransferHandlerDecorator(panel));
-//		dragContainer.setTransferHandler(new TransferHandler() {
-//			public int getSourceActions(JComponent c) {
-//				return TransferHandler.NONE;
-//			}
-//
-//			public boolean canImport(TransferSupport support) {
-//				try {
-//					return support.getTransferable().getTransferData(DataFlavor.stringFlavor) != null;
-//				} catch (Throwable e) {
-//					return false;
-//				}
-//			}
-//
-//			public boolean importData(TransferHandler.TransferSupport info) {
-//				if (info.isDrop()) {
-//					try {
-//						String panelId = (String)info.getTransferable().getTransferData(DataFlavor.stringFlavor);
-//						Point point = info.getDropLocation().getDropPoint();
-//						
-//						if (panelId.equals(panel1)) {
-//							panel.setLocation(point.x - phase.width, point.y - phase.height);
-//							panel.revalidate();
-//						}
-//						return true;
-//					} catch (Throwable e) {
-//						return false;
-//					}
-//				} else {
-//					return false;
-//				}
-//			}
-//		});
-		
+		dragContainer.setTransferHandler(transferHandle);
 
 		final GlassPane glassPane = new GlassPane();
 		frame.setGlassPane(glassPane);
+
+//		glassPane.addMouseListener(new MouseListener() {
+//
+//			public void mouseClicked(MouseEvent e) {
+//				int modifiers = e.getModifiers();
+//
+//				if ((modifiers & InputEvent.BUTTON1_MASK) == InputEvent.BUTTON1_MASK) {
+//					System.out.println("Left button pressed.");
+//				} else
+//
+//					System.out.println("name: mouseClicked");
+//			}
+//
+//			public void mousePressed(MouseEvent e) {
+//				System.out.println("name: mousePressed");
+//			}
+//
+//			public void mouseReleased(MouseEvent e) {
+//				System.out.println("name: mouseReleased");
+//			}
+//
+//			public void mouseEntered(MouseEvent e) {
+//				System.out.println("name: mouseEntered");
+//			}
+//
+//			public void mouseExited(MouseEvent e) {
+//				System.out.println("name: mouseExited");
+//			}
+//		});
 
 		// Слушатель для перерисовки перетаскиваемого образа
 		DragSourceAdapter dsa = new DragSourceAdapter() {
@@ -183,12 +202,19 @@ public class DndExample {
 		DragSource.getDefaultDragSource().addDragSourceListener(dsa);
 		DragSource.getDefaultDragSource().addDragSourceMotionListener(dsa);
 
-		frame.setDefaultCloseOperation(args.length > 0 ? JFrame.DISPOSE_ON_CLOSE : JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(500, 500);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 
 		glassPane.setVisible(true);
+
 	}
+
+	public static void main(String[] args) {
+		new DndExample();
+	}
+
+	// ========== MouseListener ==========
 
 }
