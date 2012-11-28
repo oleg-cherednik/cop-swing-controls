@@ -1,5 +1,6 @@
 package lay;
 
+import java.awt.AWTEvent;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,6 +19,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
@@ -53,13 +55,14 @@ public class DndExample/* implements MouseListener */{
 		// }
 
 		final JFrame frame = new JFrame();
+		
 
 		// frame.getContentPane().setLayout(new BorderLayout());
 		// frame.getContentPane().setBackground(Color.red);
 
 		// Контейнер в котором будет происходить ДнД
-		final DragContainer dragContainer = new DragContainer();
-		// dragContainer.setOpaque(false);
+		final SectionViewer dragContainer = new SectionViewer();
+		 dragContainer.setOpaque(false);
 		// dragContainer.setLayout(null);
 		frame.getContentPane().add(dragContainer, BorderLayout.CENTER);
 
@@ -69,9 +72,9 @@ public class DndExample/* implements MouseListener */{
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.weightx = 1;
 
-		dragContainer.add(new Section("Section 1", Color.yellow), gbc);
-		dragContainer.add(new Section("Section 2", Color.green), gbc);
-		dragContainer.add(new Section("Section 3", Color.blue), gbc);
+		dragContainer.add(new Section(dragContainer, "Section 1", Color.yellow), gbc);
+		dragContainer.add(new Section(dragContainer, "Section 2", Color.green), gbc);
+		dragContainer.add(new Section(dragContainer, "Section 3", Color.blue), gbc);
 
 		gbc.weighty = 1;
 
@@ -142,6 +145,19 @@ public class DndExample/* implements MouseListener */{
 
 		final GlassPane glassPane = new GlassPane();
 		frame.setGlassPane(glassPane);
+//		
+//		glassPane.addMouseMotionListener(new MouseMotionListener() {
+//			
+//			public void mouseMoved(MouseEvent e) {
+//				System.out.println("glass: mouseMoved - " + e.getModifiers() + " - " + e.getModifiersEx());
+//				
+//			}
+//			
+//			public void mouseDragged(MouseEvent e) {
+//				System.out.println("glass: mouseDragged");
+//				
+//			}
+//		});
 
 //		glassPane.addMouseListener(new MouseListener() {
 //

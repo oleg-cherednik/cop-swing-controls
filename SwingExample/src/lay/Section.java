@@ -1,6 +1,5 @@
 package lay;
 
-import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,17 +15,22 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 
-import com.alee.gui.AWTUtilitiesWrapper;
-
-public class Section extends JPanel implements FocusListener, MouseMotionListener, MouseListener {
+public class Section extends JPanel implements MouseMotionListener, MouseListener {
 	private final JTextArea text = new JTextArea("input");
 	private final JLabel label = new JLabel("Drag me somewhere!", SwingConstants.CENTER);
 	private final JButton button = new JButton("Some custom button");
 	private final Color color;
+	private final Border redBorder = BorderFactory.createLineBorder(Color.red, 3);
+	private final Border grayBorder = BorderFactory.createLineBorder(Color.gray, 1);
+	private boolean selected;
+	private final SectionViewer viewer;
 
-	public Section(String name, Color color) {
+	public Section(SectionViewer viewer, String name, Color color) {
 		super(new BorderLayout(4, 4));
+		
+		this.viewer = viewer;
 
 		setName(name);
 
@@ -34,46 +38,32 @@ public class Section extends JPanel implements FocusListener, MouseMotionListene
 		init();
 
 		setPreferredSize(new Dimension(200, 100));
-
 		setBackground(this.color = color);
-		setFocusable(true);
-
-//		enableEvents(AWTEvent.MOUSE_MOTION_EVENT_MASK);
-
-//		addFocusListener(this);
-		addMouseMotionListener(this);
+		// addMouseMotionListener(this);
 		addMouseListener(this);
-//		setFocusable(true);
+
 	}
 
 	private void init() {
-		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
-				BorderFactory.createEmptyBorder(4, 4, 4, 4)));
+		setBorder(grayBorder);
 
 		add(text, BorderLayout.NORTH);
 		add(label, BorderLayout.CENTER);
 		add(button, BorderLayout.SOUTH);
 	}
 
-	protected void processMouseMotionEvent(MouseEvent evt) {
-		super.processMouseMotionEvent(evt);
-		System.out.println(getName() + ": processMouseMotionEvent");
-	}
-	
-	protected void processMouseEvent(MouseEvent e) {
-		super.processMouseEvent(e);
-		System.out.println(getName() + ": processMouseEvent");
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+		setBorder(selected ? redBorder : grayBorder);
 	}
 
-	// ========== FocusListener ==========
-
-	public void focusGained(FocusEvent event) {
-		System.out.println(getName() + ": focusGained");
+	public void onMouseEvent(MouseEvent event) {
+		System.out.println(this + " - onMouseEvent");
 	}
 
-	public void focusLost(FocusEvent event) {
-		System.out.println(getName() + ": focusLost");
-	}
+	// public void onKeyEvent(KeyEvent event) {
+	//
+	// }
 
 	// ========== MouseMotionListener ==========
 
@@ -88,30 +78,38 @@ public class Section extends JPanel implements FocusListener, MouseMotionListene
 	// ========== MouseListener ==========
 
 	public void mouseClicked(MouseEvent e) {
-		System.out.println(getName() + ": mouseClicked");
+		// System.out.println(getName() + ": mouseClicked");
 	}
 
 	public void mousePressed(MouseEvent event) {
-		if(event.getSource() != this || !event.isControlDown())
-			return;
-		
-		setBackground(Color.orange);
-		System.out.println(getName() + ": mousePressed");
+		if (selected) {
+			viewer.setGlassPaneVisible(false);
+			setBackground(Color.orange);
+		}
+		// System.out.println(getName() + ": mousePressed");
 	}
 
 	public void mouseReleased(MouseEvent event) {
-		if(event.getSource() != this)
-			return;
-		
+		// if (event.getSource() != this)
+		// return;
+
 		setBackground(color);
-		System.out.println(getName() + ": mouseReleased");
+		viewer.setGlassPaneVisible(true);
+
+		// System.out.println(getName() + ": mouseReleased");
 	}
 
 	public void mouseEntered(MouseEvent e) {
-		System.out.println(getName() + ": mouseEntered");
+		// System.out.println(getName() + ": mouseEntered");
 	}
 
 	public void mouseExited(MouseEvent e) {
-		System.out.println(getName() + ": mouseExited");
+		// System.out.println(getName() + ": mouseExited");
+	}
+
+	// ========== Object ==========
+
+	public String toString() {
+		return getName();
 	}
 }
