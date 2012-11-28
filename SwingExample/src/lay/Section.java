@@ -1,23 +1,33 @@
 package lay;
 
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.border.Border;
 
 public class Section extends JPanel implements MouseMotionListener, MouseListener {
+	static final String panel1 = "panel1";
+
+	static Dimension phase;
+	private BufferedImage dragged;
+	
 	private final JTextArea text = new JTextArea("input");
 	private final JLabel label = new JLabel("Drag me somewhere!", SwingConstants.CENTER);
 	private final JButton button = new JButton("Some custom button");
@@ -94,7 +104,6 @@ public class Section extends JPanel implements MouseMotionListener, MouseListene
 		// return;
 
 		setBackground(color);
-		viewer.setGlassPaneVisible(true);
 
 		// System.out.println(getName() + ": mouseReleased");
 	}

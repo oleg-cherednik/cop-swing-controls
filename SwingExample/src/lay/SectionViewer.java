@@ -7,6 +7,12 @@ import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DragSourceMotionListener;
 import java.awt.event.AWTEventListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -15,7 +21,8 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.JRootPane;
 
-public class SectionViewer extends JRootPane implements MouseMotionListener, MouseListener, AWTEventListener {
+public class SectionViewer extends JRootPane implements MouseMotionListener, MouseListener, AWTEventListener,
+		DragSourceListener, DragSourceMotionListener {
 	private static Toolkit toolkit = Toolkit.getDefaultToolkit();
 	private static long eventMask = MOUSE_MOTION_EVENT_MASK /* | MOUSE_EVENT_MASK */| KEY_EVENT_MASK;
 
@@ -43,6 +50,8 @@ public class SectionViewer extends JRootPane implements MouseMotionListener, Mou
 		// });
 
 		toolkit.addAWTEventListener(this, eventMask);
+		DragSource.getDefaultDragSource().addDragSourceListener(this);
+		DragSource.getDefaultDragSource().addDragSourceMotionListener(this);
 	}
 
 	// ========== MouseMotionListener ==========
@@ -159,4 +168,39 @@ public class SectionViewer extends JRootPane implements MouseMotionListener, Mou
 		return null;
 	}
 
+	// ========== DragSourceListener ==========
+
+	public void dragEnter(DragSourceDragEvent dsde) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void dragOver(DragSourceDragEvent dsde) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void dropActionChanged(DragSourceDragEvent dsde) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void dragExit(DragSourceEvent dse) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void dragDropEnd(DragSourceDropEvent dsde) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	
+
+	// ========== DragSourceMotionListener ==========
+
+	public void dragMouseMoved(DragSourceDragEvent dsde) {
+		// TODO Auto-generated method stub
+
+	}
 }
