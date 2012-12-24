@@ -24,7 +24,7 @@ public class ColorUtilsTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Field field = ColorUtils.class.getDeclaredField("colors");
+		Field field = ColorUtils.class.getDeclaredField("COLORS");
 		field.setAccessible(true);
 		((Map<?, ?>)field.get(null)).clear();
 		field.setAccessible(false);
