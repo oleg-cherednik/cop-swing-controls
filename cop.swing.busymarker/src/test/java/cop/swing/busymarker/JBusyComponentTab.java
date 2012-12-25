@@ -89,8 +89,8 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 
 		busyPane.setBusyModel(model);
 
-		minDurationSpinner.setValue(10);
-		durationSpinner.setValue(2);
+		minDurationSpinner.setValue(3);
+		durationSpinner.setValue(10);
 	}
 
 	private JPanel createControlPanel() {
@@ -218,7 +218,7 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 
 		ui.setBusyIcon(basicForm.isSelected() ? basicIcon : advancedIcon);
 		ui.setRemainingTimeVisible(remainingTime.isSelected());
-		ui.setMillisToPopup((Integer)durationSpinner.getValue() * 1000);
+		ui.setMillisToDecideToPopup((Integer)minDurationSpinner.getValue() * 1000);
 
 		model.setDescription(str);
 		model.setCancellable(cancellable.isSelected());
@@ -272,7 +272,7 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 		printingCanceled.set(false);
 
 		int length = model.getMaximum() - model.getMinimum();
-		float step = length / ((Integer)minDurationSpinner.getValue()).floatValue() / 10; // 100ms refresh delay
+		float step = length / ((Integer)durationSpinner.getValue()).floatValue() / 10; // 100ms refresh delay
 
 		model.setValue(model.getMinimum());
 

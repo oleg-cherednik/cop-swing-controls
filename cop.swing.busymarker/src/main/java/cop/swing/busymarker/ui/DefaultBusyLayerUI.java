@@ -323,7 +323,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 			if (triggerEnabled) {
 				if (monitor.getWorkingTime() < getMillisToDecideToPopup())
 					return false;
-
+				
 				long remainingTime = monitor.getRemainingTime();
 				return remainingTime < 0 || remainingTime > getMillisToPopup();
 			}
