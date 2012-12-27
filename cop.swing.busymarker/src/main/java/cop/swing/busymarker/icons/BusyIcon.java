@@ -5,8 +5,9 @@ import java.util.Observable;
 import javax.swing.BoundedRangeModel;
 import javax.swing.Icon;
 
+import cop.swing.busymarker.BusyListener;
 import cop.swing.busymarker.models.BusyModel;
-import cop.swing.busymarker.ui.BusyLayerUI;
+import cop.swing.busymarker.ui.BusyLockableUI;
 
 /**
  * {@link BusyIcon} is a simple icon with <code>Busy</code> renderable capabilities.
@@ -22,15 +23,15 @@ import cop.swing.busymarker.ui.BusyLayerUI;
  * This interface don't provide any contract on how a {@link BusyIcon} should fire an event to the graphical interface
  * when it need to be repainted (when the <code>model</code> or <code>state</Code> change).<br>
  * <strong>But we strong recommand</strong> to support the {@link Observable} class for the best integration inside
- * {@link BusyLayerUI}.
+ * {@link BusyLockableUI}.
  * 
  * @author Oleg Cherednik
  * @since 26.03.2012
  */
 public interface BusyIcon extends Icon {
-	public void setModel(BusyModel model);
+	void setModel(BusyModel model);
 
-	public BusyModel getModel();
+	BusyModel getModel();
 
 	/**
 	 * Returns <code>true</code> if this icon currently render a determinate state<br>
@@ -47,5 +48,9 @@ public interface BusyIcon extends Icon {
 	 * 
 	 * @return <code>true</code> if this icon currently render a determinate state
 	 */
-	public boolean isDeterminate();
+	boolean isDeterminate();
+
+	void addListener(BusyListener listener);
+
+	void removeListener(BusyListener listener);
 }

@@ -3,6 +3,7 @@ package cop.swing.busymarker.icons;
 import java.awt.Component;
 import java.awt.Graphics;
 
+import cop.swing.busymarker.BusyListener;
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.models.EmptyBusyModel;
 
@@ -15,9 +16,7 @@ public final class EmptyBusyIcon implements BusyIcon {
 
 	private EmptyBusyIcon() {}
 
-	/*
-	 * BusyIcon
-	 */
+	// ========== BusyIcon ==========
 
 	public void paintIcon(Component c, Graphics g, int x, int y) {}
 
@@ -39,9 +38,11 @@ public final class EmptyBusyIcon implements BusyIcon {
 		return false;
 	}
 
-	/*
-	 * Object
-	 */
+	public void addListener(BusyListener listener) {}
+
+	public void removeListener(BusyListener listener) {}
+
+	// ========== Object ==========
 
 	@Override
 	public String toString() {

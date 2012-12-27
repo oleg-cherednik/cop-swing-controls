@@ -18,10 +18,14 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.BoundedRangeModel;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.EventListenerList;
 
+import cop.swing.busymarker.BusyListener;
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.models.BusyState;
 import cop.swing.busymarker.models.EmptyBusyModel;
@@ -87,7 +91,7 @@ import cop.swing.busymarker.models.EmptyBusyModel;
  * @author Oleg Cherednik
  * @since 26.03.2012
  */
-public abstract class AbstractBusyIcon extends Observable implements BusyIcon, ActionListener, ChangeListener {
+public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, ChangeListener {
 	private final List<WeakReference<Component>> components = new LinkedList<WeakReference<Component>>();
 
 	private BusyModel model = EmptyBusyModel.getInstance();
@@ -101,6 +105,8 @@ public abstract class AbstractBusyIcon extends Observable implements BusyIcon, A
 
 	private int frameCount;
 	private int frame;
+
+	protected final EventListenerList listenerList = new EventListenerList();
 
 	/**
 	 * Paint this icon in a <code>determinate</code> state at the given ratio.
@@ -216,14 +222,14 @@ public abstract class AbstractBusyIcon extends Observable implements BusyIcon, A
 	 * {@link #getSignificantRatioOffset()} information.
 	 * <p>
 	 * 
-	 * @param c Component using this icon
+	 * @param comp Component using this icon
 	 * @param g Graphics to paint on
 	 * @param x Upper left corner (horizontal value)
 	 * @param y Upper left corner (vertical value)
 	 */
-	public final void paintIcon(Component c, Graphics g, int x, int y) {
-		if (this.countObservers() == 0)
-			register(c);
+	public final void paintIcon(Component comp, Graphics g, int x, int y) {
+		if (listenerList.getListenerCount(BusyListener.class) == 0)
+			register(comp);
 
 		updateImage();
 
@@ -241,18 +247,18 @@ public abstract class AbstractBusyIcon extends Observable implements BusyIcon, A
 
 			if (busy) {
 				if (determinate)
-					paintDeterminate(c, g2d, 0, 0, ratio);
+					paintDeterminate(comp, g2d, 0, 0, ratio);
 				else
-					paintUndeterminate(c, g2d, 0, 0, frame);
+					paintUndeterminate(comp, g2d, 0, 0, frame);
 			} else
-				paintIdle(c, g2d, 0, 0);
+				paintIdle(comp, g2d, 0, 0);
 
 			lastRatio = ratio;
 			lastStateFlag = BusyState.parseBusyState(busy, determinate);
 			discarded = false;
 		}
 
-		g.drawImage(image, x, y, c);
+		g.drawImage(image, x, y, comp);
 	}
 
 	/**
@@ -282,8 +288,12 @@ public abstract class AbstractBusyIcon extends Observable implements BusyIcon, A
 				it.remove();
 		}
 
-		setChanged();
-		notifyObservers(this);
+		notifyListeners();
+	}
+
+	protected void notifyListeners() {
+		for (BusyListener listener : listenerList.getListeners(BusyListener.class))
+			listener.onBusyUpdate(this);
 	}
 
 	public final BusyModel getModel() {
@@ -399,27 +409,35 @@ public abstract class AbstractBusyIcon extends Observable implements BusyIcon, A
 		repaint(true);
 	}
 
-	/*
-	 * ActionListener
-	 */
+	// ========== BusyIcon ==========
 
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == undeterminateTimer)
+	public void addListener(BusyListener listener) {
+		if (listener != null) {
+			listenerList.remove(BusyListener.class, listener);
+			listenerList.add(BusyListener.class, listener);
+		}
+	}
+
+	public void removeListener(BusyListener listener) {
+		if (listener != null)
+			listenerList.remove(BusyListener.class, listener);
+	}
+
+	// ========== ActionListener ==========
+
+	public void actionPerformed(ActionEvent event) {
+		if (event.getSource() == undeterminateTimer)
 			onTimer();
 	}
 
-	/*
-	 * ChangeListener
-	 */
+	// ========== ChangeListener ==========
 
 	public synchronized void stateChanged(ChangeEvent e) {
 		if (e.getSource() == model)
 			onModelChanged();
 	}
 
-	/*
-	 * static
-	 */
+	// ========== static ==========
 
 	protected static BufferedImage createImage(int width, int height) {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();

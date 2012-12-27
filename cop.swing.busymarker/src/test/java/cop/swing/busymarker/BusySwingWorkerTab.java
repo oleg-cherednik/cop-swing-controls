@@ -22,7 +22,7 @@ import javax.swing.table.TableModel;
 import cop.swing.busymarker.JBusyPane;
 import cop.swing.busymarker.icons.DefaultBusyIcon;
 import cop.swing.busymarker.models.BusyModel;
-import cop.swing.busymarker.ui.DefaultBusyLayerUI;
+import cop.swing.busymarker.ui.DefaultBusyLockableUI;
 
 class BusySwingWorkerTab extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -6898514008918178990L;
@@ -48,13 +48,13 @@ class BusySwingWorkerTab extends JPanel implements ActionListener {
 		table.setModel(createTableModel());
 		jBusyTable.setView(jScrollPaneBusyTable);
 
-		BusyModel model = jBusyTable.getBusyModel();
+		BusyModel model = jBusyTable.getModel();
 		model.setCancellable(true);
 		model.setDeterminate(true);
 
-		DefaultBusyLayerUI ui = (DefaultBusyLayerUI)jBusyTable.getBusyLayerUI();
+		DefaultBusyLockableUI ui = (DefaultBusyLockableUI)jBusyTable.getBusyLayerUI();
 		ui.setRemainingTimeVisible(true);
-		ui.setBusyIcon(new DefaultBusyIcon(iconRun));
+		ui.setIcon(new DefaultBusyIcon(iconRun));
 	}
 
 	private LayoutManager createMainLayout() {
@@ -120,7 +120,7 @@ class BusySwingWorkerTab extends JPanel implements ActionListener {
 
 	private void jButtonFillTableActionPerformed() {
 		// Create a worker
-		SwingWorkerDemo worker = new SwingWorkerDemo(jBusyTable.getBusyModel(), (DefaultTableModel)table.getModel());
+		SwingWorkerDemo worker = new SwingWorkerDemo(jBusyTable.getModel(), (DefaultTableModel)table.getModel());
 		// Start the worker
 		worker.execute();
 	}

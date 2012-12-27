@@ -10,8 +10,8 @@ import org.jdesktop.jxlayer.JXLayer;
 
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.plaf.BusyPaneUI;
-import cop.swing.busymarker.ui.BusyLayerUI;
-import cop.swing.busymarker.ui.DefaultBusyLayerUI;
+import cop.swing.busymarker.ui.BusyLockableUI;
+import cop.swing.busymarker.ui.DefaultBusyLockableUI;
 
 /**
  * Component decorator that enhance <strong>any swing components</strong> with <strong>busy</strong> feature.
@@ -52,23 +52,19 @@ import cop.swing.busymarker.ui.DefaultBusyLayerUI;
  */
 public class JBusyPane extends JComponent {
 	private static final long serialVersionUID = 1818742655631641066L;
-	private static final String uiClassID = "JBusyPaneUI";
+	private static final String uiClassID = "JBusyPane";
 
 	private final JXLayer<JComponent> layer = new JXLayer<JComponent>();
-
-	static {
-		// UIManager.s
-	}
 
 	public JBusyPane() {
 		this(null);
 	}
 
 	public JBusyPane(JComponent view) {
-		this(view, new DefaultBusyLayerUI());
+		this(view, new DefaultBusyLockableUI());
 	}
 
-	public JBusyPane(JComponent view, BusyLayerUI ui) {
+	public JBusyPane(JComponent view, BusyLockableUI ui) {
 		updateUI();
 		setLayout(new BorderLayout());
 
@@ -92,32 +88,32 @@ public class JBusyPane extends JComponent {
 	/**
 	 * Returns the BusyLayerUI used by this component.
 	 * 
-	 * @return {@link BusyLayerUI} used by this component
+	 * @return {@link BusyLockableUI} used by this component
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends BusyLayerUI> T getBusyLayerUI() {
+	public <T extends BusyLockableUI> T getBusyLayerUI() {
 		return (T)layer.getUI();
 	}
 
 	/**
-	 * Define which {@link BusyLayerUI} this component must use for render the <tt>busy</tt> state
+	 * Define which {@link BusyLockableUI} this component must use for render the <tt>busy</tt> state
 	 * 
 	 * @param ui New BusyLayerUI to use
 	 */
-	public void setBusyLayerUI(BusyLayerUI ui) {
-		final BusyLayerUI old = getBusyLayerUI();
-		final BusyModel busyModel = old.getBusyModel();
+	public void setBusyLayerUI(BusyLockableUI ui) {
+		final BusyLockableUI old = getBusyLayerUI();
+		final BusyModel busyModel = old.getModel();
 
 		if (ui == null || old == ui)
 			return;
 
-		old.setBusyModel(null);
-		ui.setBusyModel(busyModel);
+		old.setModel(null);
+		ui.setModel(busyModel);
 		layer.setUI(ui);
 	}
 
 	public void setBusyModel(BusyModel model) {
-		getBusyLayerUI().setBusyModel(model);
+		getBusyLayerUI().setModel(model);
 	}
 
 	/**
@@ -125,8 +121,8 @@ public class JBusyPane extends JComponent {
 	 * 
 	 * @return BusyModel used by this component
 	 */
-	public <T extends BusyModel> T getBusyModel() {
-		return getBusyLayerUI().getBusyModel();
+	public <T extends BusyModel> T getModel() {
+		return getBusyLayerUI().getModel();
 	}
 
 	/**

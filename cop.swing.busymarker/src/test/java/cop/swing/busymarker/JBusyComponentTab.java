@@ -33,7 +33,7 @@ import cop.swing.busymarker.icons.RadialBusyIcon;
 import cop.swing.busymarker.models.BusyAction;
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.models.DefaultBusyModel;
-import cop.swing.busymarker.ui.DefaultBusyLayerUI;
+import cop.swing.busymarker.ui.DefaultBusyLockableUI;
 
 class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener, Runnable {
 	private static final long serialVersionUID = 3248525737133098787L;
@@ -214,9 +214,9 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 		if (str.trim().isEmpty())
 			str = null;
 
-		DefaultBusyLayerUI ui = busyPane.getBusyLayerUI();
+		DefaultBusyLockableUI ui = busyPane.getBusyLayerUI();
 
-		ui.setBusyIcon(basicForm.isSelected() ? basicIcon : advancedIcon);
+		ui.setIcon(basicForm.isSelected() ? basicIcon : advancedIcon);
 		ui.setRemainingTimeVisible(remainingTime.isSelected());
 		ui.setMillisToDecideToPopup((Integer)minDurationSpinner.getValue() * 1000);
 

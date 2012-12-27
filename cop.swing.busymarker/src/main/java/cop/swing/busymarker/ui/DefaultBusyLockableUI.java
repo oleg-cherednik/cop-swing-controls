@@ -7,7 +7,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Formatter;
-import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -35,7 +34,7 @@ import cop.swing.painters.MattePainter;
 import cop.swing.utils.ColorUtils;
 
 /**
- * A default implementation of {@link BusyLayerUI}.<br>
+ * A default implementation of {@link BusyLockableUI}.<br>
  * This <tt>ui</tt> provides busy animation, progress bar and cancellation button regarding the {@link BusyModel}.<br>
  * You can enhance any swing components with busy functionality like it:
  * 
@@ -64,17 +63,17 @@ import cop.swing.utils.ColorUtils;
  * @author Oleg Cherednik
  * @since 24.03.2012
  */
-public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
+public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListener {
 	private static final long serialVersionUID = -781504195248307094L;
+	private static final int REFRESH_DELAY = 32;
 
 	private final JLabel label = createLabel();
 	private final JProgressBar progressBar = new JProgressBar();
 	private final Hyperlink cancelButton = new Hyperlink("Cancel");
 	private final JPanel panel = createPanel(label, progressBar, cancelButton);
+	private final int msShadeDelay;
 
-	private final int shadeDelay; // in milliseconds
-
-	private BusyIcon busyIcon = EmptyBusyIcon.OBJ;
+	private BusyIcon icon = EmptyBusyIcon.OBJ;
 
 	/**
 	 * Members managing popup trigger and remaining time
@@ -82,8 +81,8 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 
 	private boolean remainingTimeVisible;
 	private RemainingTimeMonitor monitor;
-	private int millisToDecideToPopup = 300;
-	private int millisToPopup = 1200;
+	private int msDecidePopup = 300;
+	private int msPopup = 1200;
 
 	protected final int veilAlpha; // % of alpha [0;100]
 	protected final Color veilColor;
@@ -95,9 +94,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	private final Timer timer = new Timer(REFRESH_DELAY, this);
 	private final AtomicBoolean repainted = new AtomicBoolean(false);
 
-	private static final int REFRESH_DELAY = 32;
-
-	public DefaultBusyLayerUI() {
+	public DefaultBusyLockableUI() {
 		this(UIManager.getInt(BusyPaneUI.SHADE_DELAY), UIManager.getInt(BusyPaneUI.VEIL_ALPHA), UIManager
 				.getColor(BusyPaneUI.COLOR_VEIL));
 	}
@@ -110,12 +107,12 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 * @param veilAlpha Alpha ratio to use for the veil when the model is <code>busy</code>
 	 * @param veilColor Color to use for render the veil
 	 */
-	public DefaultBusyLayerUI(int shadeDelay, int veilAlpha, Color veilColor) {
-		this.shadeDelay = Math.max(0, shadeDelay);
+	public DefaultBusyLockableUI(int shadeDelay, int veilAlpha, Color veilColor) {
+		this.msShadeDelay = Math.max(0, shadeDelay);
 		this.veilAlpha = Math.max(0, Math.min(100, veilAlpha));
 		this.veilColor = (veilColor != null) ? veilColor : UIManager.getColor(BusyPaneUI.COLOR_VEIL);
 
-		setBusyIcon(new InfiniteBusyIcon(model));
+		setIcon(new InfiniteBusyIcon(model));
 
 		this.cancelButton.addActionListener(this);
 	}
@@ -123,23 +120,19 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	/**
 	 * Define the BusyIcon to use by this ui to render the busy animation.
 	 * 
-	 * @param busyIcon New BusyIcon to use by this ui
+	 * @param icon New BusyIcon to use by this ui
 	 */
-	public void setBusyIcon(BusyIcon busyIcon) {
-		if (this.busyIcon == busyIcon)
+	public void setIcon(BusyIcon icon) {
+		if (this.icon == icon)
 			return;
 
-		if (this.busyIcon instanceof Observable)
-			((Observable)this.busyIcon).deleteObserver(this);
+		icon.removeListener(this);
 
-		this.busyIcon.setModel(EmptyBusyModel.getInstance());
-		this.busyIcon = (busyIcon != null) ? busyIcon : EmptyBusyIcon.OBJ;
-
-		if (this.busyIcon instanceof Observable)
-			((Observable)this.busyIcon).addObserver(this);
-
-		this.busyIcon.setModel(model);
-		label.setIcon(this.busyIcon);
+		this.icon.setModel(EmptyBusyModel.getInstance());
+		this.icon = (icon != null) ? icon : EmptyBusyIcon.OBJ;
+		this.icon.addListener(this);
+		this.icon.setModel(model);
+		label.setIcon(this.icon);
 
 		update();
 	}
@@ -150,7 +143,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 * @return BusyIcon used by this ui
 	 */
 	public BusyIcon getBusyIcon() {
-		return busyIcon;
+		return icon;
 	}
 
 	/**
@@ -173,7 +166,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 * @see #getMillisToDecideToPopup
 	 */
 	public void setMillisToDecideToPopup(int millisToDecideToPopup) {
-		this.millisToDecideToPopup = millisToDecideToPopup;
+		this.msDecidePopup = millisToDecideToPopup;
 	}
 
 	/**
@@ -195,7 +188,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 * @see #setMillisToDecideToPopup
 	 */
 	public int getMillisToDecideToPopup() {
-		return millisToDecideToPopup;
+		return msDecidePopup;
 	}
 
 	/**
@@ -220,7 +213,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 * @see #getMillisToPopup
 	 */
 	public void setMillisToPopup(int millisToPopup) {
-		this.millisToPopup = millisToPopup;
+		this.msPopup = millisToPopup;
 	}
 
 	/**
@@ -244,11 +237,11 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 * @see #setMillisToPopup
 	 */
 	public int getMillisToPopup() {
-		return millisToPopup;
+		return msPopup;
 	}
 
 	/**
-	 * Define if this {@link BusyLayerUI} should show the remaining time of the job underlying the busy state.
+	 * Define if this {@link BusyLockableUI} should show the remaining time of the job underlying the busy state.
 	 * <p>
 	 * This feature works only with determinate {@link BusyModel}
 	 * 
@@ -271,31 +264,15 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	}
 
 	private final String getRemainingTimeString() {
-		if (getBusyModel().isDeterminate() && monitor != null)
+		if (getModel().isDeterminate() && monitor != null)
 			return formatTime(monitor.getRemainingTime(TimeUnit.SECONDS));
 		return null;
 	}
 
 	private final String getPercentValueString() {
-		if (getBusyModel().isDeterminate() && monitor != null)
-			return Integer.toString((int)getBusyModel().getPercentValue()) + " %";
+		if (getModel().isDeterminate() && monitor != null)
+			return Integer.toString((int)getModel().getPercentValue()) + " %";
 		return null;
-	}
-
-	private static String formatTime(long time) {
-		if (time <= 0)
-			return null;
-		if (time == Long.MAX_VALUE)
-			return "Remaining time: \u221E";
-
-		Formatter fmt = new Formatter();
-
-		if (time < 60)
-			return fmt.format("Remaining time: %ds", time).toString();
-		if (time < 3600)
-			return fmt.format("Remaining time: %dm %02ds", time / 60, time % 60).toString();
-
-		return fmt.format("Remaining time: %dh %02dm %02ds", time / 3600, time / 60, time % 60).toString();
 	}
 
 	/**
@@ -307,10 +284,10 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 * 
 	 * @return <code>true</code> if the component would be busy
 	 */
-	protected boolean isComponentBusy() {
+	protected boolean isBusy() {
 		boolean busy = model.isBusy();
 		boolean determinate = busy && model.isDeterminate();
-		boolean triggerEnabled = millisToDecideToPopup > 0 && millisToPopup > 0;
+		boolean triggerEnabled = msDecidePopup > 0 && msPopup > 0;
 
 		if (busy && determinate) {
 			if (monitor == null && (triggerEnabled || remainingTimeVisible))
@@ -321,11 +298,11 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 				return true;
 
 			if (triggerEnabled) {
-				if (monitor.getWorkingTime() < getMillisToDecideToPopup())
+				if (monitor.getWorkingTime() < msDecidePopup)
 					return false;
-				
+
 				long remainingTime = monitor.getRemainingTime();
-				return remainingTime < 0 || remainingTime > getMillisToPopup();
+				return remainingTime < 0 || remainingTime > msPopup;
 			}
 		} else if (monitor != null) {
 			monitor.dispose();
@@ -373,7 +350,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 * using any timer)
 	 */
 	private synchronized void manageBackgroundVeil(boolean busy) {
-		if (isBackgroundPainterDirty(busy) && shadeDelay <= 0)
+		if (isBackgroundPainterDirty(busy) && msShadeDelay <= 0)
 			updatePainter(busy);
 	}
 
@@ -419,7 +396,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 			shadeTime = System.currentTimeMillis();
 
 		long delta = System.currentTimeMillis() - shadeTime;
-		int ratio = (int)(delta * 1000) / shadeDelay;
+		int ratio = (int)(delta * 1000) / msShadeDelay;
 
 		if (ratio > 1000) {
 			alpha = busy ? 0xFF : 0;
@@ -433,7 +410,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	}
 
 	private synchronized void onTimer() {
-		boolean busy = isComponentBusy();
+		boolean busy = isBusy();
 
 		if (updatePainter(busy))
 			update();
@@ -442,16 +419,12 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 			repainted.set(false); // the timer is on the EDT, the updateUI is really done
 		}
 
-		if (!getBusyModel().isBusy() && !isBackgroundPainterDirty(busy))
+		if (!getModel().isBusy() && !isBackgroundPainterDirty(busy))
 			timer.stop();
 	}
 
 	private void onCancel() {
-		try {
-			getBusyModel().cancel();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		getModel().cancel();
 	}
 
 	// ========== BusyLayerUI ==========
@@ -465,21 +438,21 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	 */
 	@Override
 	protected boolean shouldLock() {
-		return isBackgroundPainterDirty(isComponentBusy()) ? true : super.shouldLock();
+		return isBackgroundPainterDirty(isBusy()) ? true : super.shouldLock();
 	}
 
 	@Override
-	public void setBusyModel(BusyModel busyModel) {
-		super.setBusyModel(busyModel);
+	public void setModel(BusyModel busyModel) {
+		super.setModel(busyModel);
 
 		progressBar.setModel(busyModel);
-		busyIcon.setModel(busyModel);
+		icon.setModel(busyModel);
 	}
 
 	@Override
 	protected void update() {
-		BusyModel busyModel = getBusyModel();
-		boolean busy = isComponentBusy();
+		BusyModel busyModel = getModel();
+		boolean busy = isBusy();
 
 		// Ensure the timer is running when the model is busy
 		if (busyModel.isBusy() && !timer.isRunning())
@@ -488,7 +461,7 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 		repainted.set(true);
 		panel.setVisible(busy);
 		label.setVisible(busy);
-		progressBar.setVisible(busy && busyModel.isDeterminate() && !busyIcon.isDeterminate());
+		progressBar.setVisible(busy && busyModel.isDeterminate() && !icon.isDeterminate());
 		cancelButton.setVisible(busy && busyModel.isCancellable());
 
 		manageBackgroundVeil(busy);
@@ -538,6 +511,24 @@ public class DefaultBusyLayerUI extends BusyLayerUI implements ActionListener {
 	}
 
 	// ========== static ==========
+
+	private static String formatTime(long time) {
+		if (time < 0)
+			return null;
+		if (time == Long.MAX_VALUE)
+			return "Remaining time: \u221E";
+
+		Formatter fmt = new Formatter();
+
+		if (time == 0)
+			return fmt.format("Remaining time: <1s").toString();
+		if (time < 60)
+			return fmt.format("Remaining time: %ds", time).toString();
+		if (time < 3600)
+			return fmt.format("Remaining time: %dm %02ds", time / 60, time % 60).toString();
+
+		return fmt.format("Remaining time: %dh %02dm %02ds", time / 3600, time / 60, time % 60).toString();
+	}
 
 	private static GridBagConstraints updateGridBagConstraints(GridBagConstraints gbc, int insetTop) {
 		gbc.anchor = GridBagConstraints.CENTER;
