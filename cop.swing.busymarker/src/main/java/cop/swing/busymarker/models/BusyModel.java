@@ -63,9 +63,8 @@ public interface BusyModel extends BoundedRangeModel {
 	void setCancellable(boolean value);
 
 	/**
-	 * Invoke this method to cancel the current job responsible of the <code>busy</code> state. You need to override
-	 * this method for implements you own cancellation process. Cancelling a task fire an {@link ActionEvent} to all
-	 * registered {@link ActionListener} to this model.
+	 * Invoke this method to cancel the current job responsible of the <code>busy</code> state. This method fires an
+	 * {@link ActionEvent} to all registered {@link ActionListener} to this model.
 	 */
 	void cancel();
 
@@ -92,5 +91,5 @@ public interface BusyModel extends BoundedRangeModel {
 	 */
 	void removeActionListener(ActionListener listener);
 
-	float getPercentValue();
+	double getPercentValue();
 }

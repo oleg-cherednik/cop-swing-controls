@@ -9,7 +9,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * Default Implementation of interface <code>BusyModel</code>.
+ * Default Implementation of interface {@link BusyModel}.
  * <p>
  * It add <code>AutoCompletion</code> feature for determinate model. This feature allow to move the current value to the
  * minimum range when the busy property is set to <code>true</code>.<br>
@@ -169,7 +169,7 @@ public class DefaultBusyModel extends DefaultBoundedRangeModel implements BusyMo
 	 * 
 	 * @param event the <code>ActionEvent</code> object
 	 */
-	protected void fireActionPerformed(final ActionEvent event) {
+	protected final void fireActionPerformed(final ActionEvent event) {
 		if (SwingUtilities.isEventDispatchThread())
 			for (ActionListener listener : listenerList.getListeners(ActionListener.class))
 				listener.actionPerformed(event);
@@ -181,7 +181,7 @@ public class DefaultBusyModel extends DefaultBoundedRangeModel implements BusyMo
 			});
 	}
 
-	/* BoundedRangeModel */
+	// ========== BoundedRangeModel ==========
 
 	@Override
 	public void setValue(int value) {
@@ -191,11 +191,13 @@ public class DefaultBusyModel extends DefaultBoundedRangeModel implements BusyMo
 			setBusy(false);
 	}
 
-	/* BusyModel */
+	// ========== BusyModel ==========
 
 	public void addActionListener(ActionListener listener) {
-		if (listener != null)
+		if (listener != null) {
+			listenerList.remove(ActionListener.class, listener);
 			listenerList.add(ActionListener.class, listener);
+		}
 	}
 
 	public void removeActionListener(ActionListener listener) {
@@ -204,33 +206,29 @@ public class DefaultBusyModel extends DefaultBoundedRangeModel implements BusyMo
 	}
 
 	// [0;100]. -1 - undefined
-	public float getPercentValue() {
+	public double getPercentValue() {
 		if (!busy || !determinateState)
 			return -1;
 
 		int range = getMaximum() - getMinimum();
 		int value = getValue();
 
-		return (100f / range) * (value - getMinimum());
+		return (100. / range) * (value - getMinimum());
 	}
 
-	/* DefaultBoundedRangeModel */
+	// ========== DefaultBoundedRangeModel ==========
 
 	@Override
 	protected void fireStateChanged() {
 		if (SwingUtilities.isEventDispatchThread())
 			super.fireStateChanged();
 		else
-			SwingUtilities.invokeLater(fireStateChanged);
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					fireStateChanged();
+				}
+			});
 	}
-
-	/* runnable tasks */
-
-	private final Runnable fireStateChanged = new Runnable() {
-		public void run() {
-			fireStateChanged();
-		}
-	};
 
 	// ========== Object ==========
 
