@@ -46,7 +46,7 @@ import cop.swing.utils.ColorUtils;
  * JXLayer<JLabel>; layer = new JXLayer<JLabel>(label);
  * 
  * // Create the Busy Layer UI delegate
- * BusyLayerUI ui = new DefaultBusyLayerUI();
+ * BusyLockableUI ui = new DefaultBusyLockableUI();
  * 
  * // Attach the UI to the decorator
  * layer.setUI(ui);
@@ -110,7 +110,7 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 	public DefaultBusyLockableUI(int shadeDelay, int veilAlpha, Color veilColor) {
 		this.msShadeDelay = Math.max(0, shadeDelay);
 		this.veilAlpha = Math.max(0, Math.min(100, veilAlpha));
-		this.veilColor = (veilColor != null) ? veilColor : UIManager.getColor(BusyPaneUI.COLOR_VEIL);
+		this.veilColor = veilColor != null ? veilColor : UIManager.getColor(BusyPaneUI.COLOR_VEIL);
 
 		setIcon(new InfiniteBusyIcon(model));
 
@@ -142,7 +142,7 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 	 * 
 	 * @return BusyIcon used by this ui
 	 */
-	public BusyIcon getBusyIcon() {
+	public BusyIcon getIcon() {
 		return icon;
 	}
 
@@ -151,7 +151,7 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 	 * underlying model is.
 	 * <p>
 	 * This feature purpose is to prevent to show a progress bar for a very very short time.<br>
-	 * This {@link _BusyLayerUI} wait few times (300ms by default) and decide to popup the progress bar or not.
+	 * This {@link BusyLockableUI} wait few times (300ms by default) and decide to popup the progress bar or not.
 	 * <p>
 	 * The decision was made by computing a predicted remaining time of the underlying task.<br>
 	 * If the remaining time is long enough (>= 1200ms by default), the progress bar will shown.
@@ -174,7 +174,7 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 	 * model to the component.
 	 * <p>
 	 * This feature purpose is to prevent to show a progress bar for a very very short time.<br>
-	 * This {@link _BusyLayerUI} wait few times (300ms by default) and decide to popup the progress bar or not.
+	 * This {@link BusyLockableUI} wait few times (300ms by default) and decide to popup the progress bar or not.
 	 * <p>
 	 * The decision was made by computing a predicted remaining time of the underlying task.<br>
 	 * If the remaining time is long enough (>= 1200ms by default), the progress bar will shown.
@@ -198,7 +198,7 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 	 * If its long enough regarding this property, the progress bar will be shown.
 	 * <p>
 	 * This feature purpose is to prevent to show a progress bar for a very very short time.<br>
-	 * This {@link _BusyLayerUI} wait few times (300ms by default) and decide to popup the progress bar or not.
+	 * This {@link BusyLockableUI} wait few times (300ms by default) and decide to popup the progress bar or not.
 	 * <p>
 	 * The decision was made by computing a predicted remaining time of the underlying task.<br>
 	 * If the remaining time is long enough (>= 1200ms by default), the progress bar will shown.
@@ -223,7 +223,7 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 	 * If its long enough regarding this property, the progress bar will be shown.
 	 * <p>
 	 * This feature purpose is to prevent to show a progress bar for a very very short time.<br>
-	 * This {@link _BusyLayerUI} wait few times (300ms by default) and decide to popup the progress bar or not.
+	 * This {@link BusyLockableUI} wait few times (300ms by default) and decide to popup the progress bar or not.
 	 * <p>
 	 * The decision was made by computing a predicted remaining time of the underlying task.<br>
 	 * If the remaining time is long enough (>= 1200ms by default), the progress bar will shown.
@@ -451,24 +451,24 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 
 	@Override
 	protected void update() {
-		BusyModel busyModel = getModel();
+		BusyModel model = getModel();
 		boolean busy = isBusy();
 
 		// Ensure the timer is running when the model is busy
-		if (busyModel.isBusy() && !timer.isRunning())
+		if (model.isBusy() && !timer.isRunning())
 			timer.start();
 
 		repainted.set(true);
 		panel.setVisible(busy);
 		label.setVisible(busy);
-		progressBar.setVisible(busy && busyModel.isDeterminate() && !icon.isDeterminate());
-		cancelButton.setVisible(busy && busyModel.isCancellable());
+		progressBar.setVisible(busy && model.isDeterminate() && !icon.isDeterminate());
+		cancelButton.setVisible(busy && model.isCancellable());
 
 		manageBackgroundVeil(busy);
 
 		// If cancellable, update it's border regarding the progress bar visible state
 		if (busy) {
-			String description = busyModel.getDescription();
+			String description = model.getDescription();
 			String str = remainingTimeVisible ? getRemainingTimeString() : getPercentValueString();
 
 			label.setText((description != null) ? description : str);
