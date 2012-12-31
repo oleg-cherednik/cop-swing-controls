@@ -207,10 +207,10 @@ public abstract class BusySwingWorker<T, V> extends SwingWorker<T, V> {
 		 */
 		private int scale(float value, BusyModel model) {
 			// normal scale : 0 ~ 100
-			float range = model.getMaximum() - model.getMinimum();
+			float range = model.getRange();
 
 			// scale it
-			float result = (value * (range / 100)) + model.getMinimum();
+			float result = (value * (model.getRange() / 100)) + model.getMinimum();
 
 			// round it and return it
 			return Math.round(result);

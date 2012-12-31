@@ -4,34 +4,31 @@ package cop.swing.busymarker.models;
  * @author Oleg Cherednik
  * @since 09.04.2012
  */
-class WeightBusyModel {
+final class WeightBusyModel {
 	private final BusyModel model;
-	private float weight;
+	private int weight;
 
-	public WeightBusyModel(BusyModel model, float weight) {
+	public WeightBusyModel(BusyModel model, int weight) {
 		this.model = model;
 		this.weight = weight;
 	}
 
-	/**
-	 * Récupere la valeur au sein du BoundedRangeModel spécifié correspondant à ce SplittedBoundedRangeModel
-	 */
-	public int getExtentPartFor(float totalWeight, BusyModel other) {
+	public int getExtentPartFor(int totalWeight, BusyModel other) {
 		// min <= value <= value+extent <= max
-		int length = getModel().getMaximum() - getModel().getMinimum();
-		int position = (getModel().getValue() + getModel().getExtent()) - getModel().getMinimum();
+		int length = model.getMaximum() - model.getMinimum();
+		int position = (model.getValue() + model.getExtent()) - model.getMinimum();
 		float ratio = (float)position / (float)length;
 
 		int otherLength = other.getMaximum() - other.getMinimum() - other.getExtent();
-		float otherRatio = ratio * (this.weight / totalWeight);
+		double otherRatio = ratio * ((double)this.weight / totalWeight);
 		return (int)(otherLength * otherRatio);
 	}
 
-	public float getWeight() {
+	public int getWeight() {
 		return weight;
 	}
 
-	public void setWeight(float weight) {
+	public void setWeight(int weight) {
 		this.weight = weight;
 	}
 
@@ -39,9 +36,7 @@ class WeightBusyModel {
 		return model;
 	}
 
-	/*
-	 * Object
-	 */
+	// ========== Object ==========
 
 	@Override
 	public int hashCode() {

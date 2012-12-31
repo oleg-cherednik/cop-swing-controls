@@ -271,8 +271,7 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 	public final void run() {
 		printingCanceled.set(false);
 
-		int length = model.getMaximum() - model.getMinimum();
-		float step = length / ((Integer)durationSpinner.getValue()).floatValue() / 10; // 100ms refresh delay
+		float step = model.getRange() / ((Integer)durationSpinner.getValue()).floatValue() / 10; // 100ms refresh delay
 
 		model.setValue(model.getMinimum());
 

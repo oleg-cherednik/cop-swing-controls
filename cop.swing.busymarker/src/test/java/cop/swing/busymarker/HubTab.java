@@ -25,7 +25,7 @@ import javax.swing.event.ChangeListener;
 import cop.swing.busymarker.icons.BusyIcon;
 import cop.swing.busymarker.icons.RadialBusyIcon;
 import cop.swing.busymarker.models.BusyModel;
-import cop.swing.busymarker.models.BusyModelSet;
+import cop.swing.busymarker.models.BusyModelHub;
 import cop.swing.busymarker.models.DefaultBusyModel;
 
 class HubTab extends JPanel implements ChangeListener {
@@ -52,10 +52,10 @@ class HubTab extends JPanel implements ChangeListener {
 	private final JLabel jLabelHelp3 = new JLabel(" = xxx %");
 
 	private final BusyModel busyModel = new DefaultBusyModel();
-	private final BusyModelSet busyModelSet = new BusyModelSet(busyModel);
-	private final BoundedRangeModel busyModel1 = busyModelSet.createFragment(10);
-	private final BoundedRangeModel busyModel2 = busyModelSet.createFragment(10);
-	private final BoundedRangeModel busymodel3 = busyModelSet.createFragment(10);
+	private final BusyModelHub busyModelSet = new BusyModelHub(busyModel);
+	private final BusyModel busyModel1 = busyModelSet.createModel(10);
+	private final BusyModel busyModel2 = busyModelSet.createModel(10);
+	private final BusyModel busymodel3 = busyModelSet.createModel(10);
 
 	private final BusyIcon iconHub = new RadialBusyIcon(iconJava);
 
@@ -470,9 +470,9 @@ class HubTab extends JPanel implements ChangeListener {
 	}
 
 	private void updateHubModels() {
-		busyModelSet.setWeight(busyModelSet.indexOf(busyModel1), (Integer)jSpinnerModel1.getValue());
-		busyModelSet.setWeight(busyModelSet.indexOf(busyModel2), (Integer)jSpinnerModel2.getValue());
-		busyModelSet.setWeight(busyModelSet.indexOf(busymodel3), (Integer)jSpinnerModel3.getValue());
+		busyModelSet.setWeight(busyModel1, (Integer)jSpinnerModel1.getValue());
+		busyModelSet.setWeight(busyModel2, (Integer)jSpinnerModel2.getValue());
+		busyModelSet.setWeight(busymodel3, (Integer)jSpinnerModel3.getValue());
 
 		busyModel1.setValue(jSliderModel1.getValue());
 		busyModel2.setValue(jSliderModel2.getValue());
@@ -483,17 +483,14 @@ class HubTab extends JPanel implements ChangeListener {
 		updateHubHelps(busymodel3, jLabelHelp3);
 	}
 
-	private void updateHubHelps(BoundedRangeModel subModel, JLabel component) {
+	private void updateHubHelps(BusyModel subModel, JLabel component) {
 		DecimalFormat df = new DecimalFormat("#00.00");
-		float prc_current = (float)subModel.getValue() / (float)(subModel.getMaximum() - subModel.getMinimum()) * 100f;
-		float prc_total = this.busyModelSet.getWeight(this.busyModelSet.indexOf(subModel))
-				/ this.busyModelSet.getTotalWeight() * 100f;
+		float prc_current = (float)subModel.getValue() / (float)subModel.getRange() * 100f;
+		float prc_total = (float)this.busyModelSet.getWeight(subModel) / this.busyModelSet.getWeight() * 100f;
 		component.setText(df.format(prc_current) + " % of " + df.format(prc_total) + " %");
 	}
-
-	/*
-	 * ChangeListener
-	 */
+	
+	// ========== ChangeListener ==========
 
 	public void stateChanged(ChangeEvent event) {
 		if (event.getSource() == jSliderModel3)

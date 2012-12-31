@@ -193,6 +193,10 @@ public class DefaultBusyModel extends DefaultBoundedRangeModel implements BusyMo
 
 	// ========== BusyModel ==========
 
+	public int getRange() {
+		return getMaximum() - getMinimum();
+	}
+
 	public void addActionListener(ActionListener listener) {
 		if (listener != null) {
 			listenerList.remove(ActionListener.class, listener);
@@ -207,13 +211,7 @@ public class DefaultBusyModel extends DefaultBoundedRangeModel implements BusyMo
 
 	// [0;100]. -1 - undefined
 	public double getPercentValue() {
-		if (!busy || !determinateState)
-			return -1;
-
-		int range = getMaximum() - getMinimum();
-		int value = getValue();
-
-		return (100. / range) * (value - getMinimum());
+		return !busy || !determinateState ? -1 : (100. / getRange()) * (getValue() - getMinimum());
 	}
 
 	// ========== DefaultBoundedRangeModel ==========

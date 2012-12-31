@@ -1,14 +1,12 @@
 package cop.swing.busymarker.models;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import cop.swing.ArrayIterator;
 
 /**
  * A {@link BoundedRangeModelHub} can split a {@link BoundedRangeModel} (call <code>master model</code>) in sub-models.
@@ -61,45 +59,45 @@ import cop.swing.ArrayIterator;
  * @author Oleg Cherednik
  * @since 09.04.2012
  */
-public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel> {
-	private List<WeightBusyModel> subs = new ArrayList<WeightBusyModel>();
-	private BusyModel master;
-	private float totalWeight = 0f;
+public class BusyModelHub implements ChangeListener {
+	private final Map<BusyModel, WeightBusyModel> models = new LinkedHashMap<BusyModel, WeightBusyModel>();
+	private BusyModel masterModel;
+	private int totalWeight;
 	private boolean changing;
 
 	/**
 	 * Create an empty <code>BoundedRangeModelHub</code> without master model.
 	 * <p>
-	 * The master model must be set with the {@link #setMasterBoundedRangeModel(javax.swing.BoundedRangeModel)} method.<br>
-	 * Sub-models must be created or added with {@link #createFragment(float)} or
-	 * {@link #addFragment(javax.swing.BoundedRangeModel, float)} methods.
+	 * The master model must be set with the {@link #setMasterModel(javax.swing.BoundedRangeModel)} method.<br>
+	 * Sub-models must be created or added with {@link #createModel(float)} or
+	 * {@link #addModel(javax.swing.BoundedRangeModel, float)} methods.
 	 * 
-	 * @see #setMasterBoundedRangeModel(BoundedRangeModel)
-	 * @see #createFragment(float)
+	 * @see #setMasterModel(BoundedRangeModel)
+	 * @see #createModel(float)
 	 */
-	public BusyModelSet() {
+	public BusyModelHub() {
 		this(null);
 	}
 
 	/**
 	 * Create an empty <code>BoundedRangeModelHub</code> with the specified master model.
 	 * <p>
-	 * Sub-models must be created or added with {@link #createFragment(float)} or
-	 * {@link #addFragment(javax.swing.BoundedRangeModel, float)} methods.
+	 * Sub-models must be created or added with {@link #createModel(float)} or
+	 * {@link #addModel(javax.swing.BoundedRangeModel, float)} methods.
 	 * 
-	 * @see #setMasterBoundedRangeModel(BoundedRangeModel)
-	 * @see #createFragment(float)
+	 * @see #setMasterModel(BoundedRangeModel)
+	 * @see #createModel(float)
 	 */
-	public BusyModelSet(BusyModel master) {
-		setMasterBoundedRangeModel(master);
+	public BusyModelHub(BusyModel masterModel) {
+		setMasterModel(masterModel);
 	}
 
 	/**
 	 * Define the master model to compute from changes mades on sub-models. Any changes that applies from sub-models are
 	 * forwarded to the master model and the hub re-compute it's value.
 	 * <p>
-	 * Each sub-models can be created or added by {@link #createFragment(float)} or
-	 * {@link #addFragment(javax.swing.BoundedRangeModel, float)} methods.<br>
+	 * Each sub-models can be created or added by {@link #createModel(float)} or
+	 * {@link #addModel(javax.swing.BoundedRangeModel, float)} methods.<br>
 	 * Each sub-models have a weight that describe how combine theses sub-models for computing the master's value.
 	 * <p>
 	 * Two sub-models with the same <code>weight</code> represent the same range progression inside the master model.<br>
@@ -108,33 +106,29 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * This weighting must be a positive weight and just serve to compute a factor for each sub-models regarding theses
 	 * weight.
 	 * 
-	 * @param model New master model to bound to this hub. (can be <code>null</code>)
-	 * @see #createFragment(float)
+	 * @param masterModel New master model to bound to this hub. (can be <code>null</code>)
+	 * @see #createModel(float)
 	 */
-	public synchronized void setMasterBoundedRangeModel(BusyModel model) {
-		BoundedRangeModel oldMaster = this.master;
-		if (oldMaster != null) {
-			oldMaster.removeChangeListener(this);
+	public synchronized void setMasterModel(BusyModel masterModel) {
+		if (this.masterModel == masterModel)
+			return;
+
+		if (this.masterModel != null)
+			this.masterModel.removeChangeListener(this);
+
+		if (masterModel == null)
+			for (WeightBusyModel model : models.values())
+				model.getModel().removeChangeListener(this);
+		else {
+			masterModel.addChangeListener(this);
+
+			if (this.masterModel == null)
+				for (WeightBusyModel model : models.values())
+					model.getModel().addChangeListener(this);
 		}
 
-		this.master = model;
-
-		if (this.master == null) {
-			for (WeightBusyModel sub : subs) {
-				sub.getModel().removeChangeListener(this);
-			}
-		} else {
-			this.master.addChangeListener(this);
-
-			if (oldMaster == null) {
-				for (WeightBusyModel sub : subs) {
-					sub.getModel().addChangeListener(this);
-				}
-			}
-		}
-		if (oldMaster != this.master) {
-			stateChanged(null);
-		}
+		this.masterModel = masterModel;
+		stateChanged(null);
 	}
 
 	/**
@@ -142,10 +136,10 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * Any changes that applies from sub-models are forwarded to this model and this hub update it's value.
 	 * 
 	 * @return Master model managed by this hub (may be null)
-	 * @see #createFragment(float)
+	 * @see #createModel(float)
 	 */
-	public synchronized BusyModel getMasterBoundedRangeModel() {
-		return this.master;
+	public synchronized BusyModel getMasterModel() {
+		return masterModel;
 	}
 
 	/**
@@ -163,12 +157,12 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * @return The newly created sub-model.
 	 * @throws IllegalArgumentException if <code>weight</code> is negative.
 	 */
-	public synchronized BoundedRangeModel createFragment(float weight) {
-		return addFragment(new DefaultBusyModel(), weight);
+	public synchronized BusyModel createModel(int weight) {
+		return addModel(new DefaultBusyModel(), weight);
 	}
 
 	/**
-	 * Add a {@link BoundedRangeModel} as a sub-model with a specified <strong>weight</strong>.<br>
+	 * Add a {@link BusyModel} as a sub-model with a specified <strong>weight</strong>.<br>
 	 * Any changes that applies from this added sub-model are forwarded to the master model for update it's value.
 	 * <p>
 	 * The added sub-model has a weight that describe how much this fragment take part on the master model.<br>
@@ -178,29 +172,34 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * This weighting has no particular constraint, it juste help to compute a factor for each sub-models regarding
 	 * theses weight.
 	 * 
-	 * @param fragment Sub-model to add to this hub
+	 * @param model Sub-model to add to this hub
 	 * @param weight Weight to bound to the newly created sub-model (fragment)
 	 * @return Return the added sub-model.
 	 * @throws NullPointerException if fragment is <code>null</code>
 	 * @throws IllegalArgumentException if <code>weight</code> is negative.
 	 */
-	public synchronized BoundedRangeModel addFragment(BusyModel fragment, float weight) {
-		if (fragment == null) {
+	public synchronized BusyModel addModel(BusyModel model, int weight) {
+		if (models.containsKey(model))
+			return model;
+
+		if (model == null)
 			throw new NullPointerException();
-		}
 		if (weight < 0)
 			throw new IllegalArgumentException("weight must be positive");
+		if (masterModel == model)
+			throw new IllegalArgumentException("master model can't be sub model at the same time");
 
-		WeightBusyModel splitted = new WeightBusyModel(fragment, weight);
-		if (master != null) {
-			splitted.getModel().addChangeListener(this);
-		}
-		subs.add(splitted);
+		WeightBusyModel subModel = new WeightBusyModel(model, weight);
+
+		if (masterModel != null)
+			subModel.getModel().addChangeListener(this);
+
+		models.put(model, subModel);
 
 		this.totalWeight += weight;
-
 		stateChanged(null);
-		return splitted.getModel();
+
+		return model;
 	}
 
 	/**
@@ -213,16 +212,16 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * @return The removed sub-model, <code>null</code> if no sub-model was removed.
 	 * @throws IndexOutOfBoundsException If index is out of bound.
 	 */
-	public synchronized BoundedRangeModel removeFragment(int index) {
-		WeightBusyModel splitted = this.subs.remove(index);
-		if (splitted != null) {
-			splitted.getModel().removeChangeListener(this);
-			this.totalWeight = this.totalWeight - splitted.getWeight();
-			stateChanged(null);
+	public synchronized BusyModel removeModel(BusyModel model) {
+		WeightBusyModel subModel = models.remove(model);
 
-			return splitted.getModel();
+		if (subModel != null) {
+			model.removeChangeListener(this);
+			totalWeight -= subModel.getWeight();
+			stateChanged(null);
 		}
-		return null;
+
+		return model;
 	}
 
 	/**
@@ -232,22 +231,14 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * 
 	 * @return Each sub-models managed by this hub for update the master model.
 	 */
-	public synchronized BoundedRangeModel[] getFragments() {
-		BoundedRangeModel[] result = new BoundedRangeModel[this.subs.size()];
-		for (int i = 0; i < this.subs.size(); i++) {
-			result[i] = this.subs.get(i).getModel();
-		}
-		return result;
-	}
+	public synchronized BusyModel[] getModels() {
+		BusyModel[] result = new BusyModel[models.size()];
+		int i = 0;
 
-	/**
-	 * Create an iterator over sub-models managed by this hub.<br>
-	 * The iteration order ensure that sub-models's index on the array are the same that sub-models's index on this hub.
-	 * 
-	 * @return Iterator from all sub-models managed by this hub for update the master model.
-	 */
-	public synchronized Iterator<BoundedRangeModel> iterator() {
-		return new ArrayIterator<BoundedRangeModel>(getFragments());
+		for (WeightBusyModel weightModel : models.values())
+			result[i++] = weightModel.getModel();
+
+		return result;
 	}
 
 	/**
@@ -256,36 +247,7 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * @return The number of sub-models in this hub.
 	 */
 	public synchronized int size() {
-		return this.subs.size();
-	}
-
-	/**
-	 * Return sub-model's index in this hub for the specified sub-model.<br>
-	 * This index can be used with {@link #getWeight(int)}, {@link #setWeight(int, float)} and much more.
-	 * <p>
-	 * If the specified model is not a sub-model on this hub, this method return <code>-1</code
-	 * 
-	 * @param model Sub-model for which we want it's index
-	 * @return Sub-model's index or <code>-1</code> if the specified model is not a sub-model on this hub.
-	 */
-	public synchronized int indexOf(BoundedRangeModel model) {
-		for (int i = 0; i < this.subs.size(); i++) {
-			if (model == this.subs.get(i).getModel()) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * Get a sub-model by it's index inside this hub.
-	 * 
-	 * @param index Index of the requested sub-model
-	 * @return Requested sub-model
-	 * @throws IndexOutOfBoundsException if index is out of bound.
-	 */
-	public synchronized BoundedRangeModel getFragment(int index) {
-		return this.subs.get(index).getModel();
+		return models.size();
 	}
 
 	/**
@@ -304,8 +266,8 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * @see #indexOf(BoundedRangeModel)
 	 * @see #setWeight(int, float)
 	 */
-	public synchronized float getWeight(int index) {
-		return this.subs.get(index).getWeight();
+	public synchronized int getWeight(BusyModel model) {
+		return models.get(model).getWeight();
 	}
 
 	/**
@@ -319,18 +281,18 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * weight.
 	 * 
 	 * @param index Index of the requested sub-model for which this method will change it's weight.
-	 * @param newWeight New weight to bound to the specified sub-model.
+	 * @param weight New weight to bound to the specified sub-model.
 	 * @throws IllegalArgumentException if <code>weight</code> is negative.
 	 * @see #indexOf(BoundedRangeModel)
 	 * @see #getWeight(int)
 	 */
-	public synchronized void setWeight(int index, float newWeight) {
-		if (newWeight < 0)
+	public synchronized void setWeight(BusyModel model, int weight) {
+		if (weight < 0)
 			throw new IllegalArgumentException("Weight must be positive");
 
-		float oldWeight = getWeight(index);
-		this.subs.get(index).setWeight(newWeight);
-		this.totalWeight = this.totalWeight - oldWeight + newWeight;
+		WeightBusyModel weightModel = models.get(model);
+		totalWeight += weight - weightModel.getWeight();
+		weightModel.setWeight(weight);
 		stateChanged(null);
 	}
 
@@ -342,13 +304,13 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * 
 	 * @return Total weight of this hub.
 	 */
-	public synchronized float getTotalWeight() {
-		return this.totalWeight;
+	public synchronized int getWeight() {
+		return totalWeight;
 	}
 
 	/**
 	 * Free all resources of this hub.<br>
-	 * This method is the same than a call to {@link #setMasterBoundedRangeModel(javax.swing.BoundedRangeModel)} with
+	 * This method is the same than a call to {@link #setMasterModel(javax.swing.BoundedRangeModel)} with
 	 * <code>null</code>.<br>
 	 * That mean the the master model is removed by this method.
 	 * <p>
@@ -356,89 +318,72 @@ public class BusyModelSet implements ChangeListener, Iterable<BoundedRangeModel>
 	 * In fact, all registered-listeners from this hub are removed waiting for a new master-model.
 	 */
 	public void dispose() {
-		setMasterBoundedRangeModel(null);
+		setMasterModel(null);
 	}
+
+	// ========== ChangeListener ==========
 
 	/**
 	 * Internal method call when a change apply from a sub-model (or the master model).<br>
 	 * This method must be public because it's a part from the {@link ChangeListener} interface,<br>
 	 * But not should be called directly.
 	 */
-	public synchronized void stateChanged(ChangeEvent e) {
-		if (changing) {
+	public synchronized void stateChanged(ChangeEvent event) {
+		if (changing)
 			return;
-		}
+
 		changing = true;
+
 		try {
-			if (getMasterBoundedRangeModel() == null) {
+			if (masterModel == null)
 				return;
-			}
 
 			int extent = 0;
 
-			for (WeightBusyModel sub : subs)
-				extent += sub.getExtentPartFor(totalWeight, master);
+			for (WeightBusyModel model : models.values())
+				extent += model.getExtentPartFor(totalWeight, masterModel);
 
-			master.setValue(extent);
+			masterModel.setValue(extent);
 		} finally {
 			changing = false;
 		}
 	}
 
+	// ========== static ==========
+
 	/**
-	 * Split the specified {@link BoundedRangeModel} on sub-models which all will have the same weight (
-	 * <code>1.0f</code>).<br>
-	 * The specified model will become the master model of the resulted {@link BusyModelSet}.<br>
+	 * Split the specified {@link BusyModel} on sub-models which all will have the same weight ( <code>1</code>).<br>
+	 * The specified model will become the master model of the resulted {@link BusyModelHub}.<br>
 	 * 
-	 * @param toSplit BoundedRangeModel to split.
+	 * @param model BusyModel to split.
 	 * @param length Number of sub-models to create. Each sub-models will have the same weight.
 	 * @return Hub resulting of this split operation.
 	 */
-	public static BusyModelSet split(BusyModel toSplit, int length) {
-		float[] weights = new float[length];
-		for (int i = 0; i < length; i++) {
-			weights[i] = 1.0f;
-		}
-		return split(toSplit, weights);
+	public static BusyModelHub split(BusyModel model, int length) {
+		int[] weights = new int[length];
+		Arrays.fill(weights, 1);
+		return split(model, weights);
 	}
 
 	/**
-	 * Split the specified {@link BoundedRangeModel} on multiple sub-models.
+	 * Split the specified {@link BusyModel} on multiple sub-models.
 	 * <p>
 	 * This method take an array of weight to distribute on sub-models.<br>
 	 * The split operation will result in a sub-model's count equally to the length of the weight's array.<br>
 	 * 
-	 * @param toSplit BoundedRangeModel to split.
+	 * @param model BoundedRangeModel to split.
 	 * @param weights Weight's array giving the number of sub-models to create and theses weights to use.
 	 * @return Hub resulting of this split operation.
 	 */
-	public static BusyModelSet split(BusyModel toSplit, Number... weights) {
-		float[] fWeight = new float[weights.length];
-		for (int i = 0; i < weights.length; i++) {
-			fWeight[i] = weights[i].floatValue();
-		}
-		return split(toSplit, fWeight);
-	}
-
-	/**
-	 * Split the specified {@link BoundedRangeModel} on multiple sub-models.
-	 * <p>
-	 * This method take an array of weight to distribute on sub-models.<br>
-	 * The split operation will result in a sub-model's count equally to the length of the weight's array.<br>
-	 * 
-	 * @param toSplit BoundedRangeModel to split.
-	 * @param weights Weight's array giving the number of sub-models to create and theses weights to use.
-	 * @return Hub resulting of this split operation.
-	 */
-	public static BusyModelSet split(BusyModel toSplit, float... weights) {
-		if (weights == null) {
+	public static BusyModelHub split(BusyModel model, int... weights) {
+		if (weights == null)
 			return null;
-		}
 
-		BusyModelSet hub = new BusyModelSet(toSplit);
-		for (int i = 0; i < weights.length; i++) {
-			hub.createFragment(weights[i]);
-		}
+		BusyModelHub hub = new BusyModelHub(model);
+
+		for (int weight : weights)
+			hub.createModel(weight);
+
 		return hub;
 	}
 }

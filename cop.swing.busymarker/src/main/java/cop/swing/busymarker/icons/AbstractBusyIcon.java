@@ -341,7 +341,7 @@ public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, Chan
 			if (!model.isDeterminate())
 				return 0f;
 
-			int length = model.getMaximum() - model.getMinimum();
+			int length = model.getRange();
 			int value = model.getValue() + model.getExtent();
 			return (float)value / (float)length;
 		}
