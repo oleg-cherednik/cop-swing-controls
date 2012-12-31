@@ -9,7 +9,6 @@ import javax.swing.event.ChangeListener;
 import org.jdesktop.jxlayer.JXLayer;
 import org.jdesktop.jxlayer.plaf.ext.LockableUI;
 
-import cop.swing.busymarker.BusyListener;
 import cop.swing.busymarker.icons.BusyIcon;
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.models.DefaultBusyModel;
@@ -21,7 +20,7 @@ import cop.swing.busymarker.models.DefaultBusyModel;
  * @author Oleg Cherednik
  * @since 27.03.2012
  */
-public abstract class BusyLockableUI extends LockableUI implements ChangeListener, BusyListener {
+public abstract class BusyLockableUI extends LockableUI implements ChangeListener {
 	private static final long serialVersionUID = -8168015295084189438L;
 
 	private AtomicBoolean lastBusyState = new AtomicBoolean(false);
@@ -61,9 +60,13 @@ public abstract class BusyLockableUI extends LockableUI implements ChangeListene
 		return model.isBusy();
 	}
 
-	// ========== BusyListener ==========
+	private void onBusyModelChanged() {
+		boolean busy = model.isBusy();
 
-	public void onBusyUpdate(BusyIcon icon) {
+		if (lastBusyState.get() == busy)
+			return;
+
+		lastBusyState.set(busy);
 		update();
 	}
 
@@ -78,12 +81,9 @@ public abstract class BusyLockableUI extends LockableUI implements ChangeListene
 	// ========== ChangeListener ==========
 
 	public void stateChanged(ChangeEvent event) {
-		boolean busy = model.isBusy();
-
-		if (lastBusyState.get() == busy)
-			return;
-
-		lastBusyState.set(busy);
-		update();
+		if (event.getSource() instanceof BusyIcon)
+			update();
+		else if (event.getSource() instanceof BusyModel)
+			onBusyModelChanged();
 	}
 }

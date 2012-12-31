@@ -3,7 +3,8 @@ package cop.swing.busymarker.icons;
 import java.awt.Component;
 import java.awt.Graphics;
 
-import cop.swing.busymarker.BusyListener;
+import javax.swing.event.ChangeListener;
+
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.models.EmptyBusyModel;
 
@@ -12,7 +13,11 @@ import cop.swing.busymarker.models.EmptyBusyModel;
  * @since 09.04.2012
  */
 public final class EmptyBusyIcon implements BusyIcon {
-	public static final BusyIcon OBJ = new EmptyBusyIcon();
+	private static final EmptyBusyIcon INSTANCE = new EmptyBusyIcon();
+
+	public static EmptyBusyIcon getInstance() {
+		return INSTANCE;
+	}
 
 	private EmptyBusyIcon() {}
 
@@ -38,9 +43,9 @@ public final class EmptyBusyIcon implements BusyIcon {
 		return false;
 	}
 
-	public void addListener(BusyListener listener) {}
+	public void addChangeListener(ChangeListener listener) {}
 
-	public void removeListener(BusyListener listener) {}
+	public void removeChangeListener(ChangeListener listener) {}
 
 	// ========== Object ==========
 

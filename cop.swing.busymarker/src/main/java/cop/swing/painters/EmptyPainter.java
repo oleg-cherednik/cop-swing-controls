@@ -14,7 +14,7 @@ public final class EmptyPainter implements LayoutPainter<Component> {
 	private EmptyPainter() {}
 
 	@SuppressWarnings("unchecked")
-	public static final <T extends Component> LayoutPainter<T> create() {
+	public static final <T extends Component> LayoutPainter<T> getInstance() {
 		return (LayoutPainter<T>)INSTANCE;
 	}
 

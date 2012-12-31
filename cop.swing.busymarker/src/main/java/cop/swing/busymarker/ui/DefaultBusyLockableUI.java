@@ -73,7 +73,7 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 	private final JPanel panel = createPanel(label, progressBar, cancelButton);
 	private final int msShadeDelay;
 
-	private BusyIcon icon = EmptyBusyIcon.OBJ;
+	private BusyIcon icon = EmptyBusyIcon.getInstance();
 
 	/**
 	 * Members managing popup trigger and remaining time
@@ -90,7 +90,7 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 	private long shadeTime;
 
 	private int alpha; // [0;0xFF]
-	private LayoutPainter<JPanel> painter = EmptyPainter.create();
+	private LayoutPainter<JPanel> painter = EmptyPainter.getInstance();
 	private final Timer timer = new Timer(REFRESH_DELAY, this);
 	private final AtomicBoolean repainted = new AtomicBoolean(false);
 
@@ -126,11 +126,11 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 		if (this.icon == icon)
 			return;
 
-		icon.removeListener(this);
+		icon.removeChangeListener(this);
 
 		this.icon.setModel(EmptyBusyModel.getInstance());
-		this.icon = (icon != null) ? icon : EmptyBusyIcon.OBJ;
-		this.icon.addListener(this);
+		this.icon = (icon != null) ? icon : EmptyBusyIcon.getInstance();
+		this.icon.addChangeListener(this);
 		this.icon.setModel(model);
 		label.setIcon(this.icon);
 
@@ -328,9 +328,9 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 		if (alpha >= 0xFF)
 			return painter;
 		if (alpha <= 0)
-			return EmptyPainter.create();
+			return EmptyPainter.getInstance();
 
-		if (painter == EmptyPainter.<JPanel> create())
+		if (painter == EmptyPainter.<JPanel> getInstance())
 			painter = new MattePainter<JPanel>();
 
 		painter.setFillPaint(ColorUtils.getColor(veilColor, alpha));

@@ -37,7 +37,7 @@ import cop.swing.utils.ColorUtils;
  * A default LaF is installed when no customization is set.<br>
  * Theses defaults parameters can be overrided by subclasses for provide new oness:
  * <ul>
- * <li>{@link #installDefaultBackgroundPainter(Color)}: Install the default background painter</li>
+ * <li>{@link #createDefaultBackgroundPainter(Color)}: Install the default background painter</li>
  * <li>{@link #installDefaultProgressBarBounds()} : Install the default location and size of the progress bar</li>
  * <li>{@link #installDefaultProgressBarColors()} : Install default colors of the progress bar</li>
  * </ul>
@@ -82,61 +82,25 @@ public class DefaultBusyIcon extends BusyIconDecorator {
 
 	private int delay = 1000;
 
-	/**
-	 * Default constructor with the specified decorated icon.<br>
-	 * A shaded black rounded square will be used as background using an insets of (4,4,4,4)
-	 * 
-	 * @param icon Decorated icon to use
-	 */
-	public DefaultBusyIcon(Icon icon) {
-		this(icon, (Painter<?>)null);
-	}
-
 	public DefaultBusyIcon(Icon icon, BusyModel model) {
-		this(icon, (Painter<?>)null);
+		this(icon);
 		setModel(model);
 	}
 
-	/**
-	 * Constructor with the specified decorated icon.<br>
-	 * A shaded rounded square will be used as background with the specified color
-	 * 
-	 * @param icon Decorated icon to use
-	 * @param backgroundColor Color to use for draw the bakground (shaded rounded square) (if null, a black background
-	 *            will be paint)
-	 */
-	public DefaultBusyIcon(Icon icon, Color backgroundColor) {
-		this(icon, (Painter<?>)null);
-		if (backgroundColor != null) {
-			installDefaultBackgroundPainter(backgroundColor);
-		}
+	public DefaultBusyIcon(Icon icon) {
+		this(icon, Color.black);
 	}
 
-	public DefaultBusyIcon(Icon icon, Painter<?> backgroundPainter) {
+	public DefaultBusyIcon(Icon icon, Color backgroundColor) {
+		this(icon, null, backgroundColor);
+	}
+
+	private DefaultBusyIcon(Icon icon, Painter<?> painter, Color color) {
 		super(icon);
 
-		/**
-		 * Set the delay of the undeterminate capsule
-		 */
 		setDelay(500);
-
-		/**
-		 * Install default bounds of the progress bar
-		 */
 		installDefaultProgressBarBounds();
-
-		/**
-		 * Install the background
-		 */
-		if (backgroundPainter != null) {
-			setBackgroundPainter(backgroundPainter);
-		} else {
-			installDefaultBackgroundPainter(Color.black);
-		}
-
-		/**
-		 * Install progress bar colors
-		 */
+		setBackgroundPainter(painter != null ? painter : createDefaultBackgroundPainter(color));
 		installDefaultProgressBarColors();
 	}
 
@@ -274,24 +238,28 @@ public class DefaultBusyIcon extends BusyIconDecorator {
 	 * Define the new background {@link Painter} creating the default painter with the specified color.<br>
 	 * This method replace the previous Background Painter that can be set with the
 	 * {@link #setBackgroundPainter(org.jdesktop.swingx.painter.Painter)}.<br>
-	 * See {@link #installDefaultBackgroundPainter(java.awt.Color)} method for see how this background will be render.
+	 * See {@link #createDefaultBackgroundPainter(java.awt.Color)} method for see how this background will be render.
 	 * 
 	 * @param color Color to use (can't be <code>null</code>
 	 */
 	public void setBackgroundColor(Color color) {
-		installDefaultBackgroundPainter(color);
+		createDefaultBackgroundPainter(color);
 	}
 
 	/**
 	 * Define the new background {@link Painter} to use for render it.<br>
 	 * This painter may be null, that means no background will be painted.
 	 * 
-	 * @param painter The new background painter to use for render it.
+	 * @param backgroundPainter The new background painter to use for render it.
 	 */
-	public void setBackgroundPainter(Painter<?> painter) {
-		Painter<?> old = getBackgroundPainter();
-		this.backgroundPainter = painter;
-		if (old != getBackgroundPainter())
+	public void setBackgroundPainter(Painter<?> backgroundPainter) {
+		if (backgroundPainter == null)
+			backgroundPainter = createDefaultBackgroundPainter(Color.black);
+
+		Painter<?> old = this.backgroundPainter;
+		this.backgroundPainter = backgroundPainter;
+
+		if (old != backgroundPainter)
 			repaint(true);
 	}
 
@@ -397,21 +365,23 @@ public class DefaultBusyIcon extends BusyIconDecorator {
 	 * <p>
 	 * Subclasses can override this method for provide an other default background.
 	 */
-	protected void installDefaultBackgroundPainter(Color color) {
+	protected Painter<?> createDefaultBackgroundPainter(Color color) {
 		float[] fractions = { 0.2f, 0.8f };
 		Color[] colors = { ColorUtils.brighter(color, 0.6f), color };
+		int width = getIconWidth();
+		int height = getIconHeight();
 
-		Paint gradient = new LinearGradientPaint(0f, 0f, 0f, getIconHeight(), fractions, colors);
-		RectanglePainter<Component> filler = new RectanglePainter<Component>(getIconWidth(), getIconHeight());
+		Paint gradient = new LinearGradientPaint(0f, 0f, 0f, height, fractions, colors);
+		RectanglePainter<Component> painter = new RectanglePainter<Component>(width, height);
 
-		filler.setRoundWidth(getIconWidth() / 4);
-		filler.setRoundHeight(getIconHeight() / 4);
-		filler.setRounded(true);
-		filler.setFillPaint(gradient);
-		filler.setBorderWidth(1);
-		filler.setBorderPaint(color);
+		painter.setRoundWidth(width / 4);
+		painter.setRoundHeight(height / 4);
+		painter.setRounded(true);
+		painter.setFillPaint(gradient);
+		painter.setBorderWidth(1);
+		painter.setBorderPaint(color);
 
-		setBackgroundPainter(filler);
+		return painter;
 	}
 
 	/**
@@ -452,7 +422,6 @@ public class DefaultBusyIcon extends BusyIconDecorator {
 	/**
 	 * Paint the background using the {@link Painter}
 	 */
-	@SuppressWarnings("unused")
 	protected void paintBackground(Component obj, Graphics g) {
 		if (backgroundPainter == null)
 			return;

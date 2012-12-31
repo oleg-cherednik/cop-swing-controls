@@ -23,7 +23,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
-import cop.swing.busymarker.BusyListener;
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.models.BusyState;
 import cop.swing.busymarker.models.EmptyBusyModel;
@@ -226,7 +225,7 @@ public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, Chan
 	 * @param y Upper left corner (vertical value)
 	 */
 	public final void paintIcon(Component comp, Graphics g, int x, int y) {
-		if (listenerList.getListenerCount(BusyListener.class) == 0)
+		if (listenerList.getListenerCount(ChangeListener.class) == 0)
 			register(comp);
 
 		updateImage();
@@ -290,8 +289,10 @@ public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, Chan
 	}
 
 	protected void notifyListeners() {
-		for (BusyListener listener : listenerList.getListeners(BusyListener.class))
-			listener.onBusyUpdate(this);
+		ChangeEvent event = new ChangeEvent(this);
+
+		for (ChangeListener listener : listenerList.getListeners(ChangeListener.class))
+			listener.stateChanged(event);
 	}
 
 	public final BusyModel getModel() {
@@ -409,16 +410,16 @@ public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, Chan
 
 	// ========== BusyIcon ==========
 
-	public void addListener(BusyListener listener) {
+	public void addChangeListener(ChangeListener listener) {
 		if (listener != null) {
-			listenerList.remove(BusyListener.class, listener);
-			listenerList.add(BusyListener.class, listener);
+			listenerList.remove(ChangeListener.class, listener);
+			listenerList.add(ChangeListener.class, listener);
 		}
 	}
 
-	public void removeListener(BusyListener listener) {
+	public void removeChangeListener(ChangeListener listener) {
 		if (listener != null)
-			listenerList.remove(BusyListener.class, listener);
+			listenerList.remove(ChangeListener.class, listener);
 	}
 
 	// ========== ActionListener ==========

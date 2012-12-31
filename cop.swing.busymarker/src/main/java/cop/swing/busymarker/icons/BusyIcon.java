@@ -4,8 +4,8 @@ import java.util.Observable;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.Icon;
+import javax.swing.event.ChangeListener;
 
-import cop.swing.busymarker.BusyListener;
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.ui.BusyLockableUI;
 
@@ -50,7 +50,7 @@ public interface BusyIcon extends Icon {
 	 */
 	boolean isDeterminate();
 
-	void addListener(BusyListener listener);
+	void addChangeListener(ChangeListener listener);
 
-	void removeListener(BusyListener listener);
+	void removeChangeListener(ChangeListener listener);
 }
