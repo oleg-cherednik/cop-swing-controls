@@ -197,6 +197,14 @@ public class DefaultBusyModel extends DefaultBoundedRangeModel implements BusyMo
 		return getMaximum() - getMinimum();
 	}
 
+	public int getExtValue() {
+		return getValue() + getExtent();
+	}
+
+	public double getRatio() {
+		return (double)getExtValue() / getRange();
+	}
+
 	public void addActionListener(ActionListener listener) {
 		if (listener != null) {
 			listenerList.remove(ActionListener.class, listener);

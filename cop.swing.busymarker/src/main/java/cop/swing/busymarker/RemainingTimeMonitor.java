@@ -7,22 +7,23 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import cop.swing.CyclicBuffer;
+import cop.swing.busymarker.models.BusyModel;
 
 /**
  * Tools class that compute remaining time of a long duration task.<br>
- * The task progression is represented by the common interface {@link BoundedRangeModel}.
+ * The task progression is represented by the common interface {@link BusyModel}.
  * <p>
  * <code>RemainingTimeMonitor</code> store few past samples of the advance progression's speed and use it for compute
  * the remaining time.
  * <p>
  * This monitor use at least the last <strong>10s</strong> to do estimation but it can use greater samples depending on
- * how much frequently the {@link BoundedRangeModel} fire changes.
+ * how much frequently the {@link BusyModel} fire changes.
  * <p>
  * Exemple:
  * 
  * <pre>
  * // Create a tracker
- * RemainingTimeMonitor rtp = new RemainingTimeMonitor(myModel);
+ * RemainingTimeMonitor rtp = new RemainingTimeMonitor(model);
  * 
  * // Just simply call #getRemainingTime()
  * long remainingTime = getRemainingTime();
@@ -35,28 +36,27 @@ import cop.swing.CyclicBuffer;
  * @since 28.03.2012
  */
 public class RemainingTimeMonitor implements ChangeListener {
-	private BoundedRangeModel model = null;
-
 	private static final long MINIMUM_SAMPLE_DELAY = 1000;
 	private static final long MINIMUM_INITIAL_SAMPLE_DELAY = 100;
 	private static final int SAMPLE_COUNT = 10;
 
-	private CyclicBuffer<Sample> samples = null;
+	private final CyclicBuffer<Sample> samples;
+	private final BusyModel model;
 
-	private Sample currentSample = null;
-	private Sample lastSampleUsed = null;
+	private Sample currSample;
+	private Sample lastSampleUsed;
 	private long lastRemainingTimeResult = -1;
 	private long whenLastRemainingTimeResult = 0L;
 
 	private final long startTime = System.currentTimeMillis();
 
 	/**
-	 * Create a <code>RemainingTimeMonitor</code> for the specified {@link BoundedRangeModel}.<br>
+	 * Create a <code>RemainingTimeMonitor</code> for the specified {@link BusyModel}.<br>
 	 * This instance will use at least samples for a total of <strong>30s</strong>.
 	 * 
-	 * @param model BoundedRangeModel for which compute the remaining time
+	 * @param model BusyModel for which compute the remaining time
 	 */
-	public RemainingTimeMonitor(BoundedRangeModel model) {
+	public RemainingTimeMonitor(BusyModel model) {
 		this.model = model;
 		this.samples = new CyclicBuffer<Sample>(SAMPLE_COUNT);
 		this.model.addChangeListener(this);
@@ -67,35 +67,35 @@ public class RemainingTimeMonitor implements ChangeListener {
 	 * 
 	 * @return Monitored model
 	 */
-	public BoundedRangeModel getModel() {
-		return this.model;
+	public BusyModel getModel() {
+		return model;
 	}
 
 	/**
 	 * Internal method that manages sample snapshot
 	 */
 	private synchronized void tick() {
-		if (currentSample == null) {
-			currentSample = new Sample(getCurrentRatio());
-			return;
-		}
-		long currentTime = System.currentTimeMillis();
-		long delay = currentTime - currentSample.getStartTime();
-		if ((samples.size() < 5 && delay >= MINIMUM_INITIAL_SAMPLE_DELAY) || (delay >= MINIMUM_SAMPLE_DELAY)) {
-			float ratio = getCurrentRatio();
+		if (currSample == null)
+			currSample = new Sample(getRatio());
+		else {
+			long currentTime = System.currentTimeMillis();
+			long delay = currentTime - currSample.getStartTime();
+			if ((samples.size() < 5 && delay >= MINIMUM_INITIAL_SAMPLE_DELAY) || (delay >= MINIMUM_SAMPLE_DELAY)) {
+				double ratio = getRatio();
 
-			/**
-			 * Close the current bulk
-			 */
-			currentSample.end(ratio);
-			samples.add(currentSample);
+				/**
+				 * Close the current bulk
+				 */
+				currSample.end(ratio);
+				samples.add(currSample);
 
-			/**
-			 * Start a new one
-			 */
-			currentSample = new Sample(ratio);
+				/**
+				 * Start a new one
+				 */
+				currSample = new Sample(ratio);
+			}
+			disposeIfCompleted();
 		}
-		disposeIfCompleted();
 	}
 
 	public long getWorkingTime() {
@@ -104,12 +104,12 @@ public class RemainingTimeMonitor implements ChangeListener {
 
 	/**
 	 * Free resources.<br>
-	 * After this method call, this tool don't monitor anymore the underlying {@link BoundedRangeModel}
+	 * After this method call, this tool don't monitor anymore the underlying {@link BusyModel}
 	 */
 	public synchronized void dispose() {
-		getModel().removeChangeListener(this);
+		model.removeChangeListener(this);
 		this.samples.clear();
-		this.currentSample = null;
+		this.currSample = null;
 		this.lastSampleUsed = null;
 		this.lastRemainingTimeResult = 0; // it's ended
 	}
@@ -127,8 +127,8 @@ public class RemainingTimeMonitor implements ChangeListener {
 	}
 
 	/**
-	 * Compute the remaining time of the task underlying the {@link BoundedRangeModel}.<br>
-	 * This tool monitor and analysys the task advance speed and compute a predicted remaining time.<br>
+	 * Compute the remaining time of the task underlying the {@link BusyModel}.<br>
+	 * This tool monitor and analyzes the task advance speed and compute a predicted remaining time.<br>
 	 * If it has'nt sufficient informations in order to compute the remaining time and will return <code>-1</code>
 	 * 
 	 * @param unit Specificy the time unit to use for return the remaining time (ex: TimeUnit.SECONDS)
@@ -140,7 +140,7 @@ public class RemainingTimeMonitor implements ChangeListener {
 
 	/**
 	 * Compute the remaining time of the task underlying the {@link BoundedRangeModel}.<br>
-	 * This tool monitor and analysys the task advance speed and compute a predicted remaining time.<br>
+	 * This tool monitor and analyzes the task advance speed and compute a predicted remaining time.<br>
 	 * If it has'nt sufficient informations in order to compute the remaining time it will return <code>-1</code> In the
 	 * counterpart, if the monitoring sample can't compute a finite task duration, it will return Long.MAX_VALUE
 	 * 
@@ -160,11 +160,10 @@ public class RemainingTimeMonitor implements ChangeListener {
 			return -1L;
 		}
 
-		if (disposeIfCompleted()) {
-			return 0L;
-		}
+		if (disposeIfCompleted())
+			return 0;
 
-		float currentRatio = getRatio(getModel());
+		double currRatio = getRatio();
 		float advance = 0f;
 		long time = 0L;
 
@@ -175,40 +174,16 @@ public class RemainingTimeMonitor implements ChangeListener {
 			time += lastSampleUsed.getDuration();
 		}
 
-		float remainingRatio = 1.0f - currentRatio;
-
-		if (advance < 0.0001f) {
-			this.lastRemainingTimeResult = Long.MAX_VALUE;
-		} else {
-			this.lastRemainingTimeResult = (long)((1f / advance) * time * remainingRatio);
-		}
-		this.whenLastRemainingTimeResult = System.currentTimeMillis();
-
-		return this.lastRemainingTimeResult;
-	}
-
-	/**
-	 * Return the current advance ratio of the specified {@link BoundedRangeModel}. This advance is given as a ratio [0
-	 * ~ 1] where 0 = 0% and 1 == 100%
-	 * 
-	 * @param model BoundedRangeModel for which we want to determine the current advance ratio
-	 * @return Curent advance of the specidied{@link BoundedRangeModel}.
-	 * @see #getSignificantRatioOffset()
-	 */
-	public static float getRatio(BoundedRangeModel brm) {
-		if (brm != null) {
-			int length = brm.getMaximum() - brm.getMinimum();
-			int value = brm.getValue() + brm.getExtent();
-			return (float)value / (float)length;
-		}
-		return 0f;
+		double remRatio = 1.0 - currRatio;
+		whenLastRemainingTimeResult = System.currentTimeMillis();
+		return lastRemainingTimeResult = advance < 0.0001f ? Long.MAX_VALUE : (long)((1f / advance) * time * remRatio);
 	}
 
 	/**
 	 * Return the current advance as a ratio [0 ~ 1]
 	 */
-	private float getCurrentRatio() {
-		return getRatio(getModel());
+	private double getRatio() {
+		return getRatio(model);
 	}
 
 	/**
@@ -217,20 +192,32 @@ public class RemainingTimeMonitor implements ChangeListener {
 	 * @return true if this monitor was disposed
 	 */
 	private boolean disposeIfCompleted() {
-		if (getModel().getValue() + getModel().getExtent() >= getModel().getMaximum()) {
+		if (model.getValue() + model.getExtent() >= model.getMaximum()) {
 			dispose();
 			return true;
 		}
 		return false;
 	}
 
-	/*
-	 * ChangeListener
-	 */
+	// ========== ChangeListener ==========
 
 	public void stateChanged(ChangeEvent event) {
 		if (event.getSource() == model)
 			tick();
+	}
+
+	// ========== static ==========
+
+	/**
+	 * Return the current advance ratio of the specified {@link BusyModel}. This advance is given as a ratio [0 ~ 1]
+	 * where 0 = 0% and 1 == 100%
+	 * 
+	 * @param model BusyModel for which we want to determine the current advance ratio
+	 * @return curent advance of the given {@link BusyModel}.
+	 * @see #getSignificantRatioOffset()
+	 */
+	public static double getRatio(BusyModel model) {
+		return model != null ? model.getRatio() : 0;
 	}
 
 	/**
@@ -238,20 +225,19 @@ public class RemainingTimeMonitor implements ChangeListener {
 	 * for estimate the remaining time by extrapolation of the total amount of advance by the duration it took.
 	 */
 	private static class Sample {
+		private final long startTime;
+		private final double startRatio;
 
 		private long duration;
-		private float advance;
-
-		private long startTime;
-		private float startRatio;
+		private double advance;
 		private long endTime;
 
-		public Sample(float ratio) {
+		public Sample(double ratio) {
 			startTime = System.currentTimeMillis();
 			startRatio = ratio;
 		}
 
-		public void end(float ratio) {
+		public void end(double ratio) {
 			endTime = System.currentTimeMillis();
 			duration = endTime - startTime;
 			advance = ratio - startRatio;
@@ -261,12 +247,12 @@ public class RemainingTimeMonitor implements ChangeListener {
 			return this.duration;
 		}
 
-		public float getAdvance() {
-			return this.advance;
+		public double getAdvance() {
+			return advance;
 		}
 
 		public long getStartTime() {
-			return this.startTime;
+			return startTime;
 		}
 	}
 }

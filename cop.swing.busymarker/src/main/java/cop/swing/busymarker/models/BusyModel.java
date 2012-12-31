@@ -78,6 +78,10 @@ public interface BusyModel extends BoundedRangeModel {
 	void setDescription(String description);
 	
 	int getRange();
+	
+	int getExtValue();
+	
+	double getRatio();
 
 	/**
 	 * Adds an <code>ActionListener</code> to the model.

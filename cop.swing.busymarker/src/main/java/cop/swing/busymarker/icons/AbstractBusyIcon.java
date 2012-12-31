@@ -93,7 +93,7 @@ public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, Chan
 
 	private BusyModel model = EmptyBusyModel.getInstance();
 	private BufferedImage image;
-	private float lastRatio = -1;
+	private double lastRatio = -1;
 	private BusyState lastStateFlag;
 	private boolean discarded;
 
@@ -232,7 +232,7 @@ public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, Chan
 
 		boolean busy = model.isBusy();
 		boolean determinate = busy && isDeterminate();
-		float ratio = determinate ? getRatio() : 0f;
+		double ratio = determinate ? getRatio() : 0;
 		int frame = Math.max(0, this.frame);
 
 		if (!isCacheUpToDate(busy, determinate, ratio)) {
@@ -302,20 +302,17 @@ public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, Chan
 	/**
 	 * Indicate if the current buffer image is up to date and can be use for a quick-render of this icon.
 	 * 
-	 * @return <code>true</code> if the curent buffer image is up to date
+	 * @return <code>true</code> if the current buffer image is up to date
 	 * @see #useCache()
 	 * @see #getSignificantRatioOffset()
 	 */
-	private boolean isCacheUpToDate(boolean isBusy, boolean determinate, float ratio) {
+	private boolean isCacheUpToDate(boolean isBusy, boolean determinate, double ratio) {
 		BusyState state = BusyState.parseBusyState(isBusy, determinate);
 
 		if (state != lastStateFlag)
 			return false;
-
-		if (determinate) {
-			float offs = Math.abs(ratio - lastRatio);
-			return !discarded && (lastRatio >= 0f && offs < getSignificantRatioOffset());
-		}
+		if (determinate)
+			return !discarded && (lastRatio >= 0f && Math.abs(ratio - lastRatio) < getSignificantRatioOffset());
 
 		return !discarded;
 	}
@@ -332,20 +329,8 @@ public abstract class AbstractBusyIcon implements BusyIcon, ActionListener, Chan
 	 * @return Curent advance of the {@link BoundedRangeModel}.
 	 * @see #getSignificantRatioOffset()
 	 */
-	private float getRatio() {
-		BusyModel model = getModel();
-
-		if (model != null) {
-			if (!model.isBusy())
-				return 0f;
-			if (!model.isDeterminate())
-				return 0f;
-
-			int length = model.getRange();
-			int value = model.getValue() + model.getExtent();
-			return (float)value / (float)length;
-		}
-		return 0f;
+	private double getRatio() {
+		return model == null || !model.isBusy() || !model.isDeterminate() ? 0 : model.getRatio();
 	}
 
 	private synchronized void register(Component component) {

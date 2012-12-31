@@ -16,7 +16,7 @@ final class WeightBusyModel {
 	public int getExtentPartFor(int totalWeight, BusyModel other) {
 		// min <= value <= value+extent <= max
 		int length = model.getMaximum() - model.getMinimum();
-		int position = (model.getValue() + model.getExtent()) - model.getMinimum();
+		int position = model.getExtValue() - model.getMinimum();
 		float ratio = (float)position / (float)length;
 
 		int otherLength = other.getMaximum() - other.getMinimum() - other.getExtent();

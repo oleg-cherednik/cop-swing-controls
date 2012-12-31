@@ -31,7 +31,6 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
 import cop.swing.busymarker.models.BusyAction;
 import cop.swing.busymarker.models.BusyModel;
 import cop.swing.busymarker.models.DefaultBusyModel;
@@ -60,7 +59,7 @@ public abstract class BusySwingWorker<T, V> extends SwingWorker<T, V> {
 
 	private final StateAndProgressListener listener = new StateAndProgressListener();
 	private BusyModel model = null;
-	private final BoundedRangeModel progress = new DefaultBoundedRangeModel();
+	private final BusyModel progress = new DefaultBusyModel();
 
 	/**
 	 * Constructs this {@code BusySwingWorker} providing the specified {@link BusyModel} to use with.
@@ -198,7 +197,7 @@ public abstract class BusySwingWorker<T, V> extends SwingWorker<T, V> {
 		public void stateChanged(ChangeEvent e) {
 			BoundedRangeModel pModel = getProgressModel();
 			if (e.getSource() == pModel) {
-				setProgress(Math.round(RemainingTimeMonitor.getRatio(getProgressModel()) * 100f));
+				setProgress((int)Math.round(RemainingTimeMonitor.getRatio(progress) * 100));
 			}
 		}
 
