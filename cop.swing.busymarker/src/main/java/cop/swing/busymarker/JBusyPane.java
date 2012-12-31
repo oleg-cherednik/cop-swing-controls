@@ -121,7 +121,7 @@ public class JBusyPane extends JComponent {
 	 * 
 	 * @return BusyModel used by this component
 	 */
-	public <T extends BusyModel> T getModel() {
+	public BusyModel getModel() {
 		return getBusyLayerUI().getModel();
 	}
 

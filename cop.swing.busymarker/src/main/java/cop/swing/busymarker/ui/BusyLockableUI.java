@@ -39,9 +39,8 @@ public abstract class BusyLockableUI extends LockableUI implements ChangeListene
 		update();
 	}
 
-	@SuppressWarnings("unchecked")
-	public final <T extends BusyModel> T getModel() {
-		return (T)model;
+	public final BusyModel getModel() {
+		return model;
 	}
 
 	/**
