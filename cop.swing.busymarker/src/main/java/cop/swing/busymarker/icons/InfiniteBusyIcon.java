@@ -9,7 +9,7 @@ import cop.swing.painters.InfiniteBusyPainter;
 
 /**
  * An infinite icon rendering always an <code>undeterminate</code> state as long as the model is busy (whenever the
- * model's state). <br>
+ * model's state).<br>
  * This implementation use a {@link InfiniteBusyPainter}.<br>
  * You can set the frame rate using the method {@link #setDelay(int)} that give the delay in milliseconds between 2
  * frames.
@@ -69,7 +69,6 @@ public class InfiniteBusyIcon extends AbstractBusyIcon {
 	 * Paint a background.<br>
 	 * By default this method do nothing, but it can be overriden by subclasses
 	 */
-	@SuppressWarnings("unused")
 	protected void paintBackground(Component obj, Graphics g, int x, int y) {}
 
 	/**

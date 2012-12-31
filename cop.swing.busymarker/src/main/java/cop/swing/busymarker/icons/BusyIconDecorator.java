@@ -149,9 +149,7 @@ public abstract class BusyIconDecorator extends AbstractBusyIcon implements Imag
 		repaint(true);
 	}
 
-	/*
-	 * Icon
-	 */
+	// ========== Icon ==========
 
 	public int getIconWidth() {
 		int result = insets.left + insets.right;
@@ -163,9 +161,7 @@ public abstract class BusyIconDecorator extends AbstractBusyIcon implements Imag
 		return (icon != null) ? (result + icon.getIconHeight()) : result;
 	}
 
-	/*
-	 * ImageObserver
-	 */
+	// ========== ImageObserver ==========
 
 	public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
 		if ((infoflags & (FRAMEBITS | ALLBITS)) != 0) {
@@ -174,9 +170,7 @@ public abstract class BusyIconDecorator extends AbstractBusyIcon implements Imag
 		return (infoflags & (ALLBITS | ABORT)) == 0;
 	}
 
-	/*
-	 * Observer
-	 */
+	// ========== Observer ==========
 
 	public void update(Observable o, Object arg) {
 		doIconFrameUpdate(null);
