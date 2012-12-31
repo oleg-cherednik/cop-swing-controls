@@ -32,9 +32,7 @@ public class PainterIcon<T extends Component> implements Icon {
 		this.painter = painter;
 	}
 
-	/*
-	 * Icon
-	 */
+	// ========== Icon ==========
 
 	@SuppressWarnings("unchecked")
 	public void paintIcon(Component obj, Graphics g, int x, int y) {
