@@ -91,7 +91,7 @@ public class DefaultBusyIcon extends BusyIconDecorator {
 	public DefaultBusyIcon(Icon icon) {
 		this(icon, (Painter<?>)null);
 	}
-	
+
 	public DefaultBusyIcon(Icon icon, BusyModel model) {
 		this(icon, (Painter<?>)null);
 		setModel(model);
@@ -402,7 +402,7 @@ public class DefaultBusyIcon extends BusyIconDecorator {
 		Color[] colors = { ColorUtils.brighter(color, 0.6f), color };
 
 		Paint gradient = new LinearGradientPaint(0f, 0f, 0f, getIconHeight(), fractions, colors);
-		RectanglePainter<?> filler = new RectanglePainter<Component>(getIconWidth(), getIconHeight());
+		RectanglePainter<Component> filler = new RectanglePainter<Component>(getIconWidth(), getIconHeight());
 
 		filler.setRoundWidth(getIconWidth() / 4);
 		filler.setRoundHeight(getIconHeight() / 4);
@@ -490,8 +490,8 @@ public class DefaultBusyIcon extends BusyIconDecorator {
 	 * @param end End of the advance in a ratio (0f = at the start of the progress bar, 0.5f = at the midle of the
 	 *            progress bar, 1.0f = at the end of the progress bar)
 	 */
-	protected void paintProgressBarAdvance(Component c, Graphics g, Rectangle bounds, boolean determinate, double start,
-			double end) {
+	protected void paintProgressBarAdvance(Component c, Graphics g, Rectangle bounds, boolean determinate,
+			double start, double end) {
 		Graphics2D g2d = (Graphics2D)g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 

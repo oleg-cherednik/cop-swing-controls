@@ -24,7 +24,7 @@ import cop.swing.utils.ColorUtils;
  * @author Oleg Cherednik
  * @since 29.09.2012
  */
-public class BusyPainter<T extends Component> extends AbstractBusyPainter<T> {
+public class InfiniteBusyPainter<T extends Component> extends AbstractBusyPainter<T> {
 	private final Shape pointShape;
 	private final Trajectory trajectory;
 
@@ -32,7 +32,7 @@ public class BusyPainter<T extends Component> extends AbstractBusyPainter<T> {
 	private int totalPoints = UIManager.getInt(BusyPaneUI.TOTAL_POINTS);
 	private int trailLength = UIManager.getInt(BusyPaneUI.TREIL_LENGTH);
 
-	private Color backgroundColor = UIManager.getColor(BusyPaneUI.BP_COLOR_BACKGROUND);
+	private Color background = UIManager.getColor(BusyPaneUI.BP_COLOR_BACKGROUND);
 	private Color foregroundColor = UIManager.getColor(BusyPaneUI.BP_COLOR_FOREGROUND);
 
 	private Direction direction = Direction.CLOCKWISE;
@@ -50,11 +50,11 @@ public class BusyPainter<T extends Component> extends AbstractBusyPainter<T> {
 		BusyPaneUI.create();
 	}
 
-	public BusyPainter() {
+	public InfiniteBusyPainter() {
 		this(UIManager.getInt(BusyPaneUI.HEIGHT));
 	}
 
-	public BusyPainter(int height) {
+	public InfiniteBusyPainter(int height) {
 		this(getDefaultPointShape(height), getDefaultTrajectory(height));
 	}
 
@@ -65,7 +65,7 @@ public class BusyPainter<T extends Component> extends AbstractBusyPainter<T> {
 	 * @param point point shape
 	 * @param trajectory trajectory shape
 	 */
-	public BusyPainter(Shape point, Shape trajectory) {
+	public InfiniteBusyPainter(Shape point, Shape trajectory) {
 		this.pointShape = point;
 		this.trajectory = new Trajectory(trajectory);
 		this.segments = getSegments(trajectory);
@@ -121,7 +121,7 @@ public class BusyPainter<T extends Component> extends AbstractBusyPainter<T> {
 			return;
 
 		for (int i = 0; i < trailLength; i++)
-			trailColors[i] = ColorUtils.interpolate(foregroundColor, backgroundColor, (i * 100) / trailLength);
+			trailColors[i] = ColorUtils.interpolate(foregroundColor, background, (i * 100) / trailLength);
 
 		updateTrailColors = false;
 	}
@@ -132,7 +132,7 @@ public class BusyPainter<T extends Component> extends AbstractBusyPainter<T> {
 				if (i == (frame - j + totalPoints) % totalPoints)
 					return trailColors[j];
 
-		return backgroundColor;
+		return background;
 	}
 
 	/**
@@ -153,27 +153,27 @@ public class BusyPainter<T extends Component> extends AbstractBusyPainter<T> {
 		this.frame = frame;
 	}
 
-	public final Color getBackgroundColor() {
-		return backgroundColor;
+	public final Color getBackground() {
+		return background;
 	}
 
-	public void setBackgroundColor(Color backgroundColor) {
-		if (this.backgroundColor.equals(backgroundColor))
+	public void setBackground(Color color) {
+		if (this.background.equals(color))
 			return;
 
-		this.backgroundColor = backgroundColor;
+		this.background = color;
 		this.updateTrailColors = true;
 	}
 
-	public final Color getForegroundColor() {
+	public final Color getForeground() {
 		return foregroundColor;
 	}
 
-	public void setForegroundColor(Color foregroundColor) {
-		if (this.foregroundColor == foregroundColor)
+	public void setForeground(Color foreground) {
+		if (this.foregroundColor == foreground)
 			return;
 
-		this.foregroundColor = foregroundColor;
+		this.foregroundColor = foreground;
 		this.updateTrailColors = true;
 	}
 
@@ -213,15 +213,15 @@ public class BusyPainter<T extends Component> extends AbstractBusyPainter<T> {
 	/**
 	 * Sets length of the trail in points. Bound property.
 	 * 
-	 * @param trailLength Trail length in points.
+	 * @param length Trail length in points.
 	 */
-	public void setTrailLength(int trailLength) {
-		trailLength = Math.max(1, Math.min(totalPoints, trailLength));
+	public void setTrailLength(int length) {
+		length = Math.max(1, Math.min(totalPoints, length));
 
-		if (this.trailLength == trailLength)
+		if (this.trailLength == length)
 			return;
 
-		this.trailLength = trailLength;
+		this.trailLength = length;
 		this.updateTrailColors = true;
 	}
 

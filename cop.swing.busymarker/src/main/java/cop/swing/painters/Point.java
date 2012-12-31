@@ -12,6 +12,13 @@ public final class Point {
 	public final float x;
 	public final float y;
 
+	private static NumberFormat nf;
+
+	static {
+		NumberFormat nf = NumberFormat.getNumberInstance();
+		nf.setMaximumFractionDigits(2);
+	}
+
 	public static Point create(float x, float y) {
 		return (Float.floatToIntBits(x) != 0 || Float.floatToIntBits(y) != 0) ? new Point(x, y) : ZERO;
 	}
@@ -52,8 +59,6 @@ public final class Point {
 
 	@Override
 	public String toString() {
-		NumberFormat nf = NumberFormat.getNumberInstance();
-		nf.setMaximumFractionDigits(2);
 		return "[" + nf.format(x) + ";" + nf.format(y) + "]";
 	}
 }

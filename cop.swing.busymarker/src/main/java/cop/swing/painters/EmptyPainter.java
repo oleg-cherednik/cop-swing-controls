@@ -9,24 +9,20 @@ import java.awt.Paint;
  * @since 27.03.2012
  */
 public final class EmptyPainter implements LayoutPainter<Component> {
-	private static final Painter<Component> OBJ = new EmptyPainter();
+	private static final Painter<Component> INSTANCE = new EmptyPainter();
 
 	private EmptyPainter() {}
 
 	@SuppressWarnings("unchecked")
 	public static final <T extends Component> LayoutPainter<T> create() {
-		return (LayoutPainter<T>)OBJ;
+		return (LayoutPainter<T>)INSTANCE;
 	}
 
-	/*
-	 * Painter
-	 */
+	// ========== Painter ==========
 
 	public void paint(Graphics2D g, Component obj, int width, int height) {}
 
-	/*
-	 * LayoutPainter
-	 */
+	// ========== LayoutPainer ==========
 
 	public Paint getFillPaint() {
 		return null;

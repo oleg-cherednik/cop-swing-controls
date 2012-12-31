@@ -5,12 +5,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import cop.swing.busymarker.models.BusyModel;
-import cop.swing.painters.BusyPainter;
+import cop.swing.painters.InfiniteBusyPainter;
 
 /**
  * An infinite icon rendering always an <code>undeterminate</code> state as long as the model is busy (whenever the
  * model's state). <br>
- * This implementation use a {@link BusyPainter}.<br>
+ * This implementation use a {@link InfiniteBusyPainter}.<br>
  * You can set the frame rate using the method {@link #setDelay(int)} that give the delay in milliseconds between 2
  * frames.
  * 
@@ -21,7 +21,7 @@ public class InfiniteBusyIcon extends AbstractBusyIcon {
 	private static final int DEF_DELAY = 100;
 	private static final int DEF_HEIGHT = 26;
 
-	private BusyPainter<Component> painter;
+	private InfiniteBusyPainter<Component> painter;
 	private final int width;
 	private final int height;
 	private int delay = DEF_DELAY;
@@ -56,11 +56,11 @@ public class InfiniteBusyIcon extends AbstractBusyIcon {
 	 * @param height icon height
 	 * @param painter BusyPainter to use
 	 */
-	public InfiniteBusyIcon(int width, int height, BusyPainter<Component> painter, BusyModel model) {
+	public InfiniteBusyIcon(int width, int height, InfiniteBusyPainter<Component> painter, BusyModel model) {
 		this.width = width;
 		this.height = height;
 
-		setBusyPainter((painter != null) ? painter : new BusyPainter<Component>());
+		setBusyPainter((painter != null) ? painter : new InfiniteBusyPainter<Component>());
 		setModel(model);
 
 	}
@@ -73,7 +73,7 @@ public class InfiniteBusyIcon extends AbstractBusyIcon {
 	protected void paintBackground(Component obj, Graphics g, int x, int y) {}
 
 	/**
-	 * Paint infinite spinner animation using the {@link BusyPainter}
+	 * Paint infinite spinner animation using the {@link InfiniteBusyPainter}
 	 */
 	protected void paintInfiniteSpinner(Component obj, Graphics g, int x, int y) {
 		if (painter == null)
@@ -118,11 +118,11 @@ public class InfiniteBusyIcon extends AbstractBusyIcon {
 	}
 
 	/**
-	 * Define a new {@link BusyPainter} to use by this icon.<br>
+	 * Define a new {@link InfiniteBusyPainter} to use by this icon.<br>
 	 * 
 	 * @param painter New BusyPainter to use by this icon.
 	 */
-	public void setBusyPainter(BusyPainter<Component> painter) {
+	public void setBusyPainter(InfiniteBusyPainter<Component> painter) {
 		if (this.painter == painter)
 			return;
 
@@ -135,11 +135,11 @@ public class InfiniteBusyIcon extends AbstractBusyIcon {
 	}
 
 	/**
-	 * Retrieve the {@link BusyPainter} used by this icon.
+	 * Retrieve the {@link InfiniteBusyPainter} used by this icon.
 	 * 
 	 * @return The BusyPainter used by this icon
 	 */
-	public BusyPainter<?> getBusyPainter() {
+	public InfiniteBusyPainter<?> getBusyPainter() {
 		return painter;
 	}
 

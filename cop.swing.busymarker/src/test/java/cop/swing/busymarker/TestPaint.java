@@ -13,12 +13,12 @@ import java.awt.geom.Ellipse2D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import cop.swing.painters.BusyPainter;
+import cop.swing.painters.InfiniteBusyPainter;
 
 public class TestPaint extends JPanel {
 	private static final long serialVersionUID = -1207475454894233038L;
 	
-	private final BusyPainter painter = new BusyPainter<Component>(26);
+	private final InfiniteBusyPainter painter = new InfiniteBusyPainter<Component>(26);
 
 	private Shape shape;
 	private static float dash[] = new float[] { 1, 0.4f, 1.5f };

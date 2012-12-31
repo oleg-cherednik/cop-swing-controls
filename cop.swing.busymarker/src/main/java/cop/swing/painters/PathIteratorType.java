@@ -252,7 +252,6 @@ enum PathIteratorType {
 			segments.add(createData(currentPoint, coords));
 	}
 
-	@SuppressWarnings({ "unused", "static-method" })
 	protected boolean doCreateSegment(Point startPoint, Point currentPoint) {
 		return true;
 	}
