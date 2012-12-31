@@ -25,7 +25,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.BoundedRangeModel;
-import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
@@ -205,9 +204,6 @@ public abstract class BusySwingWorker<T, V> extends SwingWorker<T, V> {
 		 * Scale the progress value for the model range.
 		 */
 		private int scale(float value, BusyModel model) {
-			// normal scale : 0 ~ 100
-			float range = model.getRange();
-
 			// scale it
 			float result = (value * (model.getRange() / 100)) + model.getMinimum();
 
