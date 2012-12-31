@@ -27,14 +27,13 @@ import javax.swing.ImageIcon;
  * For be able to catch theses new frame events, the decorated icon must be an {@link ImageIcon} or extends
  * {@link Observable} class.
  * <p>
- * This implementation don't implements
- * {@link #paintDeterminate(java.awt.Component, java.awt.Graphics, int, int, float)} or
- * {@link #paintUndeterminate(java.awt.Component, java.awt.Graphics, int, int, int) } but offer a
- * {@link #paintDecoratedIcon(java.awt.Component, java.awt.Graphics, int, int) } that can be used by subclasses for
- * drawing the decorated icon.
+ * This implementation don't implements {@link #paintDeterminate(Component, Graphics, int, int, float)} or
+ * {@link #paintUndeterminate(Component, Graphics, int, int, int) } but offer a
+ * {@link #paintDecoratedIcon(Component, Graphics, int, int) } that can be used by subclasses for drawing the decorated
+ * icon.
  * <p>
- * The {@link #paintIdle(java.awt.Component, java.awt.Graphics, int, int) } is implemented by painting only the decorated
- * icon as is (respecting insets).<br>
+ * The {@link #paintIdle(Component, Graphics, int, int) } is implemented by painting only the decorated icon as is
+ * (respecting insets).<br>
  * You can override this method if you need to provide a more sophisticated render process for the idle state.
  * 
  * @author Oleg Cherednik
