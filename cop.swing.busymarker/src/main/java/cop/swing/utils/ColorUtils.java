@@ -89,7 +89,7 @@ public final class ColorUtils {
 	 * After what the <strong>Lightness</strong> component is <strong>increased</strong> of 25.1% (BLACK is brightned to
 	 * GRAY)
 	 * <p>
-	 * Be carefull, this method don't provide same result than the {@link Color#brighter()} method.
+	 * Be careful, this method don't provide same result than the {@link Color#brighter()} method.
 	 * 
 	 * @return a new <code>Color</code> object that is a brighter version of the specified <code>Color</code>.
 	 */
@@ -108,7 +108,7 @@ public final class ColorUtils {
 	 * <li>A factor of 1.0f will result in the WHITE color</li>
 	 * </ul>
 	 * <p>
-	 * Be carefull, this method don't provide same result than the {@link Color#brighter()} method.
+	 * Be careful, this method don't provide same result than the {@link Color#brighter()} method.
 	 * 
 	 * @return a new <code>Color</code> object that is a brighter version of the specified <code>Color</code>.
 	 */
