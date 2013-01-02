@@ -265,9 +265,7 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 			onCancelButton();
 	}
 
-	/*
-	 * Runnable
-	 */
+	// ========== Runnable ==========
 
 	public final void run() {
 		printingCanceled.set(false);
@@ -288,9 +286,7 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 		setCtrlEnabled(true);
 	}
 
-	/*
-	 * ActionListener
-	 */
+	// ========== ActionListener ==========
 
 	public void actionPerformed(ActionEvent event) {
 		if (event.getSource() == model)
@@ -310,18 +306,14 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 
 	}
 
-	/*
-	 * ChangeListener
-	 */
+	// ========== ChangeListener ==========
 
 	public void stateChanged(ChangeEvent event) {
 		if (event.getSource() == determinate)
 			onDetermibateCheckBox();
 	}
 
-	/*
-	 * static
-	 */
+	// ========== static ==========
 
 	private static GridBagConstraints createConstraints(int fill, int anchor, boolean remainder) {
 		GridBagConstraints gbc = new GridBagConstraints();
