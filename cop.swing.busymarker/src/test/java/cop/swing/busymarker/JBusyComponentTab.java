@@ -83,13 +83,14 @@ class JBusyComponentTab extends JPanel implements ActionListener, ChangeListener
 
 		cancellable.setSelected(true);
 		determinate.setSelected(true);
+		remainingTime.setSelected(true);
 
 		model.setMinimum(0);
 		model.setMaximum(1000000);
 
 		busyPane.setBusyModel(model);
 
-		minDurationSpinner.setValue(3);
+		minDurationSpinner.setValue(1);
 		durationSpinner.setValue(10);
 	}
 
