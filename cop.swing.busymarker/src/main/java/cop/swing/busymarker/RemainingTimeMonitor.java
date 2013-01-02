@@ -8,6 +8,7 @@ import javax.swing.event.ChangeListener;
 
 import cop.swing.CyclicBuffer;
 import cop.swing.busymarker.models.BusyModel;
+import cop.swing.busymarker.models.EmptyBusyModel;
 
 /**
  * Tools class that compute remaining time of a long duration task.<br>
@@ -38,9 +39,8 @@ import cop.swing.busymarker.models.BusyModel;
 public class RemainingTimeMonitor implements ChangeListener {
 	private static final long MINIMUM_SAMPLE_DELAY = 1000;
 	private static final long MINIMUM_INITIAL_SAMPLE_DELAY = 100;
-	private static final int SAMPLE_COUNT = 10;
 
-	private final CyclicBuffer<Sample> samples;
+	private final CyclicBuffer<Sample> samples = new CyclicBuffer<Sample>(10);
 	private final BusyModel model;
 
 	private Sample currSample;
@@ -48,7 +48,9 @@ public class RemainingTimeMonitor implements ChangeListener {
 	private long lastRemainingTimeResult = -1;
 	private long whenLastRemainingTimeResult = 0L;
 
-	private final long startTime = System.currentTimeMillis();
+	private long startTime = System.currentTimeMillis();
+	
+	private boolean active;
 
 	/**
 	 * Create a <code>RemainingTimeMonitor</code> for the specified {@link BusyModel}.<br>
@@ -58,8 +60,7 @@ public class RemainingTimeMonitor implements ChangeListener {
 	 */
 	public RemainingTimeMonitor(BusyModel model) {
 		this.model = model;
-		this.samples = new CyclicBuffer<Sample>(SAMPLE_COUNT);
-		this.model.addChangeListener(this);
+		setActive(true);
 	}
 
 	/**
@@ -70,6 +71,26 @@ public class RemainingTimeMonitor implements ChangeListener {
 	public BusyModel getModel() {
 		return model;
 	}
+	
+	public void setActive(boolean active) {
+		if(this.active == active)
+			return;
+		
+		this.active = active && model != EmptyBusyModel.getInstance();
+		
+		samples.clear();
+		currSample = null;
+		lastSampleUsed = null;
+		
+		if(active) {
+			model.addChangeListener(this);
+			lastRemainingTimeResult = -1;
+			startTime = System.currentTimeMillis();
+		} else {
+			model.removeChangeListener(this);
+			lastRemainingTimeResult = 0;
+		}
+	}
 
 	/**
 	 * Internal method that manages sample snapshot
@@ -78,8 +99,8 @@ public class RemainingTimeMonitor implements ChangeListener {
 		if (currSample == null)
 			currSample = new Sample(getRatio());
 		else {
-			long currentTime = System.currentTimeMillis();
-			long delay = currentTime - currSample.getStartTime();
+			long currTime = System.currentTimeMillis();
+			long delay = currTime - currSample.getStartTime();
 			if ((samples.size() < 5 && delay >= MINIMUM_INITIAL_SAMPLE_DELAY) || (delay >= MINIMUM_SAMPLE_DELAY)) {
 				double ratio = getRatio();
 
@@ -98,20 +119,8 @@ public class RemainingTimeMonitor implements ChangeListener {
 		}
 	}
 
-	public long getWorkingTime() {
+	public long getActiveTime() {
 		return System.currentTimeMillis() - startTime;
-	}
-
-	/**
-	 * Free resources.<br>
-	 * After this method call, this tool don't monitor anymore the underlying {@link BusyModel}
-	 */
-	public synchronized void dispose() {
-		model.removeChangeListener(this);
-		this.samples.clear();
-		this.currSample = null;
-		this.lastSampleUsed = null;
-		this.lastRemainingTimeResult = 0; // it's ended
 	}
 
 	/**
@@ -192,8 +201,8 @@ public class RemainingTimeMonitor implements ChangeListener {
 	 * @return true if this monitor was disposed
 	 */
 	private boolean disposeIfCompleted() {
-		if (model.getValue() + model.getExtent() >= model.getMaximum()) {
-			dispose();
+		if (model.getExtValue() >= model.getMaximum()) {
+			setActive(false);
 			return true;
 		}
 		return false;

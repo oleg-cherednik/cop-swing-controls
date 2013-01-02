@@ -298,14 +298,14 @@ public class DefaultBusyLockableUI extends BusyLockableUI implements ActionListe
 				return true;
 
 			if (triggerEnabled) {
-				if (monitor.getWorkingTime() < msDecidePopup)
+				if (monitor.getActiveTime() < msDecidePopup)
 					return false;
 
 				long remainingTime = monitor.getRemainingTime();
 				return remainingTime < 0 || remainingTime > msPopup;
 			}
 		} else if (monitor != null) {
-			monitor.dispose();
+			monitor.setActive(false);
 			monitor = null;
 		}
 
