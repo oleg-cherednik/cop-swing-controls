@@ -59,7 +59,7 @@ public class RemainingTimeMonitor implements ChangeListener {
 	 * @param model BusyModel for which compute the remaining time
 	 */
 	public RemainingTimeMonitor(BusyModel model) {
-		this.model = model;
+		this.model = model != null ? model : EmptyBusyModel.getInstance();
 		setActive(true);
 	}
 
@@ -226,7 +226,7 @@ public class RemainingTimeMonitor implements ChangeListener {
 	 * @see #getSignificantRatioOffset()
 	 */
 	public static double getRatio(BusyModel model) {
-		return model != null ? model.getRatio() : 0;
+		return model.getRatio();
 	}
 
 	/**
