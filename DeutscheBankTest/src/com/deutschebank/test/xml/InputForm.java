@@ -12,8 +12,8 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  * @author Oleg Cherednik
  * @since 02.02.2013
  */
-@XStreamAlias(DataForm.TITLE)
-public class DataForm {
+@XStreamAlias(InputForm.TITLE)
+public class InputForm {
 	public static final String TITLE = "data";
 
 	@XStreamImplicit(itemFieldName = TaskTag.TITLE)
@@ -32,7 +32,7 @@ public class DataForm {
 	// ========== static ==========
 
 	public static void process(XStream xstream) {
-		xstream.processAnnotations(DataForm.class);
+		xstream.processAnnotations(InputForm.class);
 		TaskTag.process(xstream);
 	}
 }

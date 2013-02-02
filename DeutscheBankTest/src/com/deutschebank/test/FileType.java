@@ -1,6 +1,6 @@
 ﻿package com.deutschebank.test;
 
-import com.deutschebank.test.xml.DataForm;
+import com.deutschebank.test.xml.InputForm;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -16,7 +16,7 @@ public enum FileType {
 
 		@Override
 		public XStream process(XStream xstream) {
-			DataForm.process(xstream);
+			InputForm.process(xstream);
 			return xstream;
 		}
 	},

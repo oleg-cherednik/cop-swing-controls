@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 import com.deutschebank.test.files.ScanManager;
 import com.deutschebank.test.files.Result;
-import com.deutschebank.test.xml.DataForm;
+import com.deutschebank.test.xml.InputForm;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -80,7 +80,7 @@ public class Main {
 
 	private void readArguments(String[] args) {
 		try {
-			DataForm data = FormReader.readDataXML(new File(args[0]));
+			InputForm data = FormReader.readDataXML(new File(args[0]));
 			
 			int a = 0;
 			a++;
@@ -89,7 +89,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-		DataForm.process(new XStream(new DomDriver()));
+		InputForm.process(new XStream(new DomDriver()));
 		
 		if (args != null && args.length != 0)
 			for (int i = 0, size = args.length; i < size; i++)

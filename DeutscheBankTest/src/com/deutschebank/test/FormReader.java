@@ -5,20 +5,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import com.deutschebank.test.xml.DataForm;
+import com.deutschebank.test.xml.InputForm;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public final class FormReader {
 	private FormReader() {}
 
-	public static DataForm readDataXML(File file) throws FileNotFoundException {
+	public static InputForm readDataXML(File file) throws FileNotFoundException {
 		FileInputStream fis = null;
 		XStream xstream = FileType.IN.process(createParser());
 
 		try {
 			fis = new FileInputStream(file);
-			return (DataForm)xstream.fromXML(fis);
+			return (InputForm)xstream.fromXML(fis);
 		} finally {
 			close(fis);
 		}
