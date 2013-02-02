@@ -9,7 +9,7 @@ public interface ResultStore {
 
 	void decRunningTasksAmount();
 
-	void addFile(String textPattern, String file);
+	void addFile(String regex, String file);
 
 	void addTotalFiles(int totalFiles);
 

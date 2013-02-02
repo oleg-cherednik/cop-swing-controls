@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 
-import com.deutschebank.test.files.Result;
 import com.deutschebank.test.files.ResultStore;
 
 /**
@@ -57,7 +56,7 @@ final class FindTextInFileTask extends AbstractFileTask {
 					continue;
 
 				// file is good. print path to console and add it to result store
-				out.addFile(null, file.getAbsolutePath());
+				out.addFile(regex, file.getAbsolutePath());
 
 				break;
 			}

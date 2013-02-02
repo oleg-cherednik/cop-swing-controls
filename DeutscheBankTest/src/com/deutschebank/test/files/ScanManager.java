@@ -18,6 +18,7 @@ import com.deutschebank.test.xml.TaskTag;
 public final class ScanManager implements ResultStore {
 	/** Thread pool */
 	private final ThreadPool pool;
+	private final boolean outToConsole;
 	/** Result store */
 	private final Result.Builder builder = Result.createBuilder();
 	/**
@@ -27,8 +28,9 @@ public final class ScanManager implements ResultStore {
 	private final AtomicCounter runningThreadsAmount = new AtomicCounter();
 
 	/** @param nThreads thread amount (more than zero) */
-	public ScanManager(int nThreads) {
+	public ScanManager(int nThreads, boolean outToConsole) {
 		pool = ThreadPool.newFixedThreadPool(nThreads);
+		this.outToConsole = outToConsole;
 	}
 
 	/** Dispose this object. Stop used thread pool. */
@@ -68,37 +70,6 @@ public final class ScanManager implements ResultStore {
 		builder.addTotalFolders(1);
 	}
 
-	// /**
-	// * Finds files starting from giving <tt>rootPath</tt> with giving file name pattern <tt>fileNamePattern</tt>
-	// and/or
-	// * text search string in file pattern (<tt>textSearchPattern</tt>).<br>
-	// * Each directory task and search text in file task is run on separate thread.
-	// *
-	// * @param rootPath root path (<tt>!null</tt>)
-	// * @param fileNamePattern file name pattern (<tt>!null</tt>)
-	// * @param textSearchPattern pattern for text search in file
-	// * @throws Exception in case of errors
-	// * @return {@link Result} with search result
-	// */
-	// public Result findFiles(String rootPath, String fileNamePattern, String textSearchPattern) throws Exception {
-	// if (rootPath == null || fileNamePattern == null)
-	// throw new Exception("rootPath == null || mask == null");
-	//
-	// File root = new File(rootPath);
-	//
-	// if (!root.exists())
-	// throw new Exception("Root '" + rootPath + "' is not exist");
-	//
-	// // run recursively search file in separate threads starting from root folder
-	// pool.execute(new FindFileTask(root.getAbsolutePath(), fileNamePattern, textSearchPattern, builder, pool));
-	// builder.addTotalFolders(1);
-	//
-	// // wait for all task complete
-	// while (!pool.isEmpty() || !builder.isDone()) {}
-	//
-	// return builder.createResult();
-	// }
-
 	// ========== ResultListener ==========
 
 	public void incRunningTasksAmount() {
@@ -110,7 +81,9 @@ public final class ScanManager implements ResultStore {
 	}
 
 	public void addFile(String textPattern, String file) {
-		System.out.println(file);
+		if (outToConsole)
+			System.out.println(file);
+
 		builder.addFile(file);
 	}
 

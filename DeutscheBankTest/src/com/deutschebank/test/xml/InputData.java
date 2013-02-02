@@ -18,10 +18,15 @@ public class InputData {
 	public static final String TITLE = "input";
 
 	public static final String THREADS = "threads";
+	public static final String CONSOLE = "outToConsole";
 
 	@XStreamAlias(THREADS)
 	@XStreamAsAttribute
 	private int threads;
+
+	@XStreamAlias(CONSOLE)
+	@XStreamAsAttribute
+	private boolean outToConsole;
 
 	@XStreamImplicit(itemFieldName = TaskTag.TITLE)
 	private List<TaskTag> tasks;
@@ -32,6 +37,14 @@ public class InputData {
 
 	public void setThreads(int threads) {
 		this.threads = threads;
+	}
+
+	public boolean isOutToConsole() {
+		return outToConsole;
+	}
+
+	public void setOutToConsole(boolean outToConsole) {
+		this.outToConsole = outToConsole;
 	}
 
 	public void addTask(TaskTag task) {

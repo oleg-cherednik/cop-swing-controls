@@ -59,24 +59,26 @@ public class Main {
 	public Main(String... args) throws Exception {
 		inputData = ArgumentUtils.getInputData(args);
 
-//		readArguments(args);
-//		if (args.length < 4)
-//			askForMissingArguments();
-//
-//		printArguments();
+		// readArguments(args);
+		// if (args.length < 4)
+		// askForMissingArguments();
+		//
+		// printArguments();
 	}
 
 	public Result proceed() {
-		ScanManager scanManager = new ScanManager(inputData.getThreads());
-//		ScanManager scanManager = new ScanManager(Integer.parseInt(arguments[INDEX_MAX_THREADS_AMOUNT].getValue()));
+		int nThreads = inputData.getThreads();
+		boolean outToConsole = inputData.isOutToConsole();
+		ScanManager scanManager = new ScanManager(nThreads, outToConsole);
+		// ScanManager scanManager = new ScanManager(Integer.parseInt(arguments[INDEX_MAX_THREADS_AMOUNT].getValue()));
 
 		try {
-//			String rootPath = arguments[INDEX_ROOT_PATH].getValue();
-//			String fileNamePattern = arguments[INDEX_FILE_NAME_MASK].getValue();
-//			String textSearchPattern = arguments[INDEX_PATTERN].getValue();
+			// String rootPath = arguments[INDEX_ROOT_PATH].getValue();
+			// String fileNamePattern = arguments[INDEX_FILE_NAME_MASK].getValue();
+			// String textSearchPattern = arguments[INDEX_PATTERN].getValue();
 
 			return scanManager.proceed(inputData.getTasks());
-//			return scanManager.findFiles(rootPath, fileNamePattern, textSearchPattern);
+			// return scanManager.findFiles(rootPath, fileNamePattern, textSearchPattern);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
