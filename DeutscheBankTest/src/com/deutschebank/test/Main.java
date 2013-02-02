@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 import com.deutschebank.test.files.ScanManager;
 import com.deutschebank.test.files.Result;
-import com.deutschebank.test.xml.InputForm;
+import com.deutschebank.test.xml.InputData;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -24,6 +24,8 @@ public class Main {
 	private Argument[] arguments = { new Argument("root path", "c:\\"), new Argument("file mask", "*.txt", true),
 			new Argument("stringPatternInFile", null), new Argument("maxThreadsAmount", "10") };
 
+	private final InputData inputData;
+
 	/**
 	 * Command line arguments:
 	 * <ul>
@@ -37,60 +39,57 @@ public class Main {
 	 * If arguments number is less then 4, then they will be asked through console.
 	 */
 	public static void main(String... args) {
-		Main module = new Main(args);
-		long timeIn = System.currentTimeMillis();
-		Result res = module.proceed();
-		long timeOut = System.currentTimeMillis();
+		try {
+			Main module = new Main(args);
+			long timeIn = System.currentTimeMillis();
+			Result res = module.proceed();
+			long timeOut = System.currentTimeMillis();
 
-		System.out.println(LINE);
+			System.out.println(LINE);
 
-		System.out.println("Time: " + ((timeOut - timeIn) / 1000) + " sec.");
-		System.out.println("Total files found: " + res.getResultFiles().size());
-		System.out.println("Total files searched: " + res.getTotalFiles());
-		System.out.println("Total folders searched: " + res.getTotalFolders());
+			System.out.println("Time: " + ((timeOut - timeIn) / 1000) + " sec.");
+			System.out.println("Total files found: " + res.getResultFiles().size());
+			System.out.println("Total files searched: " + res.getTotalFiles());
+			System.out.println("Total folders searched: " + res.getTotalFolders());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	public Main(String... args) {
-		readArguments(args);
+	public Main(String... args) throws Exception {
+		inputData = ArgumentUtils.getInputData(args);
 
-		if (args.length < 4)
-			askForMissingArguments();
-
-		printArguments();
+//		readArguments(args);
+//		if (args.length < 4)
+//			askForMissingArguments();
+//
+//		printArguments();
 	}
 
 	public Result proceed() {
-		ScanManager fd = new ScanManager(Integer.parseInt(arguments[INDEX_MAX_THREADS_AMOUNT].getValue()));
+		ScanManager scanManager = new ScanManager(inputData.getThreads());
+//		ScanManager scanManager = new ScanManager(Integer.parseInt(arguments[INDEX_MAX_THREADS_AMOUNT].getValue()));
 
 		try {
-			String rootPath = arguments[INDEX_ROOT_PATH].getValue();
-			String fileNamePattern = arguments[INDEX_FILE_NAME_MASK].getValue();
-			String textSearchPattern = arguments[INDEX_PATTERN].getValue();
+//			String rootPath = arguments[INDEX_ROOT_PATH].getValue();
+//			String fileNamePattern = arguments[INDEX_FILE_NAME_MASK].getValue();
+//			String textSearchPattern = arguments[INDEX_PATTERN].getValue();
 
-			return fd.findFiles(rootPath, fileNamePattern, textSearchPattern);
+			return scanManager.proceed(inputData.getTasks());
+//			return scanManager.findFiles(rootPath, fileNamePattern, textSearchPattern);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			fd.dispose();
-			fd = null;
+			scanManager.dispose();
+			scanManager = null;
 		}
 
 		return Result.createBuilder().createResult();
 	}
 
-	private void readArguments(String[] args) {
-		try {
-			InputForm data = FormReader.readDataXML(new File(args[0]));
-			
-			int a = 0;
-			a++;
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		InputForm.process(new XStream(new DomDriver()));
-		
+	private void readArguments(String... args) throws FileNotFoundException {
+		InputData data = FormReader.readDataXML(new File(args[0]));
+
 		if (args != null && args.length != 0)
 			for (int i = 0, size = args.length; i < size; i++)
 				arguments[i].setValue(args[i].trim());

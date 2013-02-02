@@ -3,7 +3,7 @@ package com.deutschebank.test.files.tasks;
 import java.io.File;
 
 import com.deutschebank.test.concurence.ThreadPool;
-import com.deutschebank.test.files.Result;
+import com.deutschebank.test.files.ResultStore;
 
 /**
  * Task to read directory and search file by given regex pattern. Each directory is scanned in separate thread. If file
@@ -15,7 +15,7 @@ import com.deutschebank.test.files.Result;
  */
 public final class FindFileTask extends AbstractFileTask {
 	/**
-	 * Root path. If it's fild with valid name or directory then this task will be run in parallel thread.
+	 * Root path. If it's field with valid name or directory then this task will be run in parallel thread.
 	 */
 	private final String rootPath;
 	/** File name regex */
@@ -32,9 +32,11 @@ public final class FindFileTask extends AbstractFileTask {
 	 * @param resultBuilder result store
 	 * @param pool thread pool to add new tasks
 	 */
-	public FindFileTask(String rootPath, String fileNameRegex, String textSearchRegex, Result.Builder resultBuilder,
-			ThreadPool pool) {
-		super(resultBuilder);
+	public FindFileTask(String rootPath, String fileNameRegex, String textSearchRegex, ThreadPool pool,
+			ResultStore out) {
+		super(out);
+
+		assert rootPath != null && !rootPath.isEmpty();
 
 		this.rootPath = rootPath;
 		this.fileNameRegex = (fileNameRegex == null || fileNameRegex.isEmpty()) ? null : fileNameRegex;
@@ -55,26 +57,18 @@ public final class FindFileTask extends AbstractFileTask {
 		if (textSearchRegex == null)
 			addFileToResult(file);
 		else
-			pool.execute(new FindTextInFileTask(file, textSearchRegex, resultBuilder));
+			pool.execute(new FindTextInFileTask(file, textSearchRegex, out));
 	}
 
 	/** Add given file to result store */
 	private void addFileToResult(File file) {
-		System.out.println(file.getAbsolutePath());
-		resultBuilder.addFile(file.getAbsolutePath());
+		out.addFile(null, file.getAbsolutePath());
 	}
 
 	// ========== AbstractFileTask ==========
 
 	protected void runImpl() {
-		File root = new File(rootPath);
-
-		if (!root.exists()) {
-			System.err.println("Root '" + rootPath + "' is not exist");
-			return;
-		}
-
-		File[] list = root.listFiles();
+		File[] list = new File(rootPath).listFiles();
 
 		if (list == null || list.length == 0)
 			return;
@@ -88,7 +82,7 @@ public final class FindFileTask extends AbstractFileTask {
 				folders++;
 
 				String rootPath = file.getAbsolutePath();
-				pool.execute(new FindFileTask(rootPath, fileNameRegex, textSearchRegex, resultBuilder, pool));
+				pool.execute(new FindFileTask(rootPath, fileNameRegex, textSearchRegex, pool, out));
 			} else {
 				// check file name and if it's OK, run search pattern in file in other thread
 				files++;
@@ -97,7 +91,7 @@ public final class FindFileTask extends AbstractFileTask {
 		}
 
 		// store statistics
-		resultBuilder.addTotalFiles(files);
-		resultBuilder.addTotalFolders(folders);
+		out.addTotalFiles(files);
+		out.addTotalFolders(folders);
 	}
 }

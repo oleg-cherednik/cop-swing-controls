@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 
 import com.deutschebank.test.files.Result;
+import com.deutschebank.test.files.ResultStore;
 
 /**
  * This runnable task opens given file and search text in it according given regex pattern.
@@ -26,12 +27,12 @@ final class FindTextInFileTask extends AbstractFileTask {
 	 * @param resultBuilder result store
 	 * @throws IllegalArgumentException if {@link #file} is not a file
 	 */
-	public FindTextInFileTask(File file, String regex, Result.Builder resultBuilder) {
-		super(resultBuilder);
+	public FindTextInFileTask(File file, String regex, ResultStore out) {
+		super(out);
 
 		assert file != null && file.isFile();
 		assert regex != null && !regex.trim().isEmpty();
-		assert resultBuilder != null;
+		assert out != null;
 
 		this.file = file;
 		this.regex = regex;
@@ -56,8 +57,7 @@ final class FindTextInFileTask extends AbstractFileTask {
 					continue;
 
 				// file is good. print path to console and add it to result store
-				System.out.println(file.getAbsolutePath());
-				resultBuilder.addFile(file.getAbsolutePath());
+				out.addFile(null, file.getAbsolutePath());
 
 				break;
 			}

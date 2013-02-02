@@ -1,6 +1,6 @@
 package com.deutschebank.test.files.tasks;
 
-import com.deutschebank.test.files.Result;
+import com.deutschebank.test.files.ResultStore;
 
 /**
  * Abstract task of the file operations
@@ -9,16 +9,13 @@ import com.deutschebank.test.files.Result;
  * @since 02.02.2013
  */
 abstract class AbstractFileTask implements Runnable {
-	/**
-	 * Result store of the task.<br>
-	 * {@link Result#inc()} is called in constructor to count runnable tasks in pool, {@link Result#dec()} is called at
-	 * the end of {@link Runnable#run()}.
-	 */
-	protected final Result.Builder resultBuilder;
+	protected final ResultStore out;
 
-	protected AbstractFileTask(Result.Builder resultBuilder) {
-		this.resultBuilder = resultBuilder;
-		resultBuilder.inc();
+	protected AbstractFileTask(ResultStore out) {
+		assert out != null;
+
+		this.out = out;
+		out.incRunningTasksAmount();
 	}
 
 	protected abstract void runImpl();
@@ -34,7 +31,7 @@ abstract class AbstractFileTask implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			resultBuilder.dec();
+			out.decRunningTasksAmount();
 		}
 	}
 }

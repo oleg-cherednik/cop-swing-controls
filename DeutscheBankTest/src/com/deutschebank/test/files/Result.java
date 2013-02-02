@@ -49,28 +49,10 @@ public final class Result {
 		private final AtomicCounter totalFiles = new AtomicCounter();
 		private final AtomicCounter totalFolders = new AtomicCounter();
 
-		/**
-		 * Amount of running threads. It uses only for internal usage.<br>
-		 * Id <tt>count == 0</tt> then all task accomplished.
-		 */
-		private final AtomicCounter count = new AtomicCounter();
-
 		private Builder() {}
 
 		public Result createResult() {
 			return new Result(this);
-		}
-
-		public void inc() {
-			count.inc();
-		}
-
-		public void dec() {
-			count.dec();
-		}
-
-		boolean isDone() {
-			return count.getValue() <= 0;
 		}
 
 		public void addFile(String file) {

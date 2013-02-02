@@ -5,22 +5,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import com.deutschebank.test.xml.InputForm;
+import com.deutschebank.test.xml.InputData;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public final class FormReader {
 	private FormReader() {}
 
-	public static InputForm readDataXML(File file) throws FileNotFoundException {
-		FileInputStream fis = null;
+	public static InputData readDataXML(File file) throws FileNotFoundException {
+		FileInputStream in = null;
 		XStream xstream = FileType.IN.process(createParser());
 
 		try {
-			fis = new FileInputStream(file);
-			return (InputForm)xstream.fromXML(fis);
+			return (InputData)xstream.fromXML(in = new FileInputStream(file));
 		} finally {
-			close(fis);
+			close(in);
 		}
 	}
 

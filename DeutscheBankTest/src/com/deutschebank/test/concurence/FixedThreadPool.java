@@ -17,7 +17,7 @@ final class FixedThreadPool extends ThreadPool {
 	/** Task queue */
 	private final Queue<Runnable> queue = new LinkedList<Runnable>();
 
-	/** @param nThreads number of therads in pool */
+	/** @param nThreads number of threads in pool */
 	public FixedThreadPool(int nThreads) {
 		threads = new TaskThread[Math.max(1, nThreads)];
 
