@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data>
+<input>
 	<task root="c:\" filePattern="1" textPattern="3"/>
 	<task root="d:\" filePattern="2" textPattern="4"/>
-</data>
+</input>

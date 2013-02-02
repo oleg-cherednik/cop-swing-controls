@@ -14,7 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  */
 @XStreamAlias(InputForm.TITLE)
 public class InputForm {
-	public static final String TITLE = "data";
+	public static final String TITLE = "input";
 
 	@XStreamImplicit(itemFieldName = TaskTag.TITLE)
 	private List<TaskTag> tasks;
