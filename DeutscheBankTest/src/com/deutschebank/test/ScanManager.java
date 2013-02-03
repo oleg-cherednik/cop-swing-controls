@@ -1,6 +1,7 @@
 package com.deutschebank.test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 
 import com.deutschebank.test.concurence.AtomicCounter;
@@ -20,7 +21,10 @@ import com.deutschebank.test.xml.TaskTag;
 public final class ScanManager implements ResultStore {
 	/** Thread pool */
 	private final ThreadPool pool;
+	/** Print fined files to console */
 	private final boolean outToConsole;
+	/** Keep putput file uptodate, write on the fly */
+	private final boolean upToDateOutput;
 	/** Result store */
 	private final Result.Builder builder = Result.createBuilder();
 	/**
@@ -30,9 +34,10 @@ public final class ScanManager implements ResultStore {
 	private final AtomicCounter runningThreadsAmount = new AtomicCounter();
 
 	/** @param nThreads thread amount (more than zero) */
-	public ScanManager(int nThreads, boolean outToConsole) {
+	public ScanManager(int nThreads, boolean outToConsole, boolean upToDateOutput) {
 		pool = ThreadPool.newFixedThreadPool(nThreads);
 		this.outToConsole = outToConsole;
+		this.upToDateOutput = upToDateOutput;
 	}
 
 	/** Dispose this object. Stop used thread pool. */
@@ -87,6 +92,13 @@ public final class ScanManager implements ResultStore {
 			System.out.println((Statistics.isEmpty(textPattern) ? "" : textPattern + " - ") + file);
 
 		builder.addFile(textPattern, file);
+
+		if (upToDateOutput)
+			try {
+				ArgumentManager.getInstance().writeOutputData(builder);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 	}
 
 	// ========== static ==========

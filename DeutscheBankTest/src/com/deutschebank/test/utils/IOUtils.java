@@ -47,6 +47,9 @@ public final class IOUtils {
 	 * @throws FileNotFoundException
 	 */
 	public static void writeOutXML(OutputData data, File file) throws FileNotFoundException {
+		assert data != null;
+		assert file != null;
+
 		FileOutputStream out = null;
 
 		try {

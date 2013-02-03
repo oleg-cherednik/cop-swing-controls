@@ -18,6 +18,7 @@ import com.deutschebank.test.xml.PathTag;
  */
 public final class Result {
 	private final Map<String, Set<String>> map;
+	private final OutputData outputData;
 
 	public static Builder createBuilder() {
 		return new Builder();
@@ -25,6 +26,7 @@ public final class Result {
 
 	private Result(Builder builder) {
 		map = builder.getMap();
+		outputData = builder.getXml();
 	}
 
 	public Map<String, Set<String>> getData() {
@@ -32,16 +34,6 @@ public final class Result {
 	}
 
 	public OutputData getXml() {
-		FoundTag foundTag;
-		OutputData outputData = new OutputData();
-
-		for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
-			outputData.addResult(foundTag = new FoundTag(entry.getKey()));
-
-			for (String path : entry.getValue())
-				foundTag.addPath(new PathTag(path));
-		}
-
 		return outputData;
 	}
 
@@ -72,6 +64,22 @@ public final class Result {
 
 		private Map<String, Set<String>> getMap() {
 			return map.isEmpty() ? Collections.<String, Set<String>> emptyMap() : Collections.unmodifiableMap(map);
+		}
+
+		private OutputData getXml() {
+			synchronized (lock) {
+				FoundTag foundTag;
+				OutputData outputData = new OutputData();
+
+				for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
+					outputData.addResult(foundTag = new FoundTag(entry.getKey()));
+
+					for (String path : entry.getValue())
+						foundTag.addPath(new PathTag(path));
+				}
+
+				return outputData;
+			}
 		}
 	}
 }

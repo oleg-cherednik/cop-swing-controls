@@ -7,11 +7,8 @@ import java.util.Scanner;
 import java.util.Set;
 
 import com.deutschebank.test.files.Result;
-import com.deutschebank.test.utils.ArgumentUtils;
 import com.deutschebank.test.utils.IOUtils;
 import com.deutschebank.test.xml.InputData;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * @author Oleg Cherednik
@@ -63,14 +60,15 @@ public class Main {
 			System.out.println("Average task delay: " + Statistics.getInstance().getAverageDelay() + " sec.");
 			System.out.println("Average task work: " + Statistics.getInstance().getAverageWork() + " sec.");
 
-//			ArgumentUtils.writeOutputData(res.getXml(), args);
+			// ArgumentUtils.writeOutputData(res.getXml(), args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public Main(String... args) throws Exception {
-		inputData = ArgumentUtils.readInputData(args);
+		ArgumentManager.getInstance().setArgumens(args);
+		inputData = ArgumentManager.getInstance().readInputData();
 	}
 
 	public Result proceed() {
@@ -78,16 +76,11 @@ public class Main {
 
 		int nThreads = inputData.getThreads();
 		boolean outToConsole = inputData.isOutToConsole();
-		ScanManager scanManager = new ScanManager(nThreads, outToConsole);
-		// ScanManager scanManager = new ScanManager(Integer.parseInt(arguments[INDEX_MAX_THREADS_AMOUNT].getValue()));
+		boolean upToDateOutput = inputData.isUpToDateOutput();
+		ScanManager scanManager = new ScanManager(nThreads, outToConsole, upToDateOutput);
 
 		try {
-			// String rootPath = arguments[INDEX_ROOT_PATH].getValue();
-			// String fileNamePattern = arguments[INDEX_FILE_NAME_MASK].getValue();
-			// String textSearchPattern = arguments[INDEX_PATTERN].getValue();
-
 			return scanManager.proceed(inputData.getTasks());
-			// return scanManager.findFiles(rootPath, fileNamePattern, textSearchPattern);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
