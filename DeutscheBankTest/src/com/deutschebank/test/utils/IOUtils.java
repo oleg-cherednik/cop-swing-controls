@@ -1,4 +1,4 @@
-﻿package com.deutschebank.test;
+﻿package com.deutschebank.test.utils;
 
 import java.io.Closeable;
 import java.io.File;
@@ -6,18 +6,28 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import com.deutschebank.test.FileType;
 import com.deutschebank.test.xml.InputData;
 import com.deutschebank.test.xml.OutputData;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
+ * Utilities for file input/output.
+ * 
  * @author Oleg Cherednik
  * @since 02.02.2013
  */
-public final class FormReader {
-	private FormReader() {}
+public final class IOUtils {
+	private IOUtils() {}
 
+	/**
+	 * Read give file as input data.
+	 * 
+	 * @param file xml file
+	 * @return {@link InputData}
+	 * @throws FileNotFoundException
+	 */
 	public static InputData readInXML(File file) throws FileNotFoundException {
 		FileInputStream in = null;
 
@@ -29,6 +39,13 @@ public final class FormReader {
 		}
 	}
 
+	/**
+	 * Save give output data to the give file.
+	 * 
+	 * @param data {@link OutputData} output data
+	 * @param file output file to write
+	 * @throws FileNotFoundException
+	 */
 	public static void writeOutXML(OutputData data, File file) throws FileNotFoundException {
 		FileOutputStream out = null;
 
@@ -45,11 +62,10 @@ public final class FormReader {
 	}
 
 	public static void close(Closeable obj) {
-		if (obj == null)
-			return;
-
-		try {
-			obj.close();
-		} catch (Exception ignored) {}
+		if (obj != null) {
+			try {
+				obj.close();
+			} catch (Exception ignored) {}
+		}
 	}
 }

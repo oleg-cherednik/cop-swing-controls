@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.deutschebank.test.files.ScanManager;
 import com.deutschebank.test.files.Result;
+import com.deutschebank.test.utils.IOUtils;
 import com.deutschebank.test.xml.InputData;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -105,7 +106,7 @@ public class Main {
 	}
 
 	private void readArguments(String... args) throws FileNotFoundException {
-		InputData data = FormReader.readInXML(new File(args[0]));
+		InputData data = IOUtils.readInXML(new File(args[0]));
 
 		if (args != null && args.length != 0)
 			for (int i = 0, size = args.length; i < size; i++)

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import com.deutschebank.test.utils.IOUtils;
 import com.deutschebank.test.xml.InputData;
 import com.deutschebank.test.xml.OutputData;
 
@@ -20,7 +21,7 @@ final class ArgumentUtils {
 
 			System.out.println("Read input file: " + file);
 
-			return FormReader.readInXML(file);
+			return IOUtils.readInXML(file);
 		}
 
 		System.out.println("Input file not found");
@@ -33,7 +34,7 @@ final class ArgumentUtils {
 			File file = new File(args[1]);
 
 			System.out.println("Write output file: " + file);
-			FormReader.writeOutXML(data, file);
+			IOUtils.writeOutXML(data, file);
 		} else
 			System.err.println("Output file not set");
 	}
