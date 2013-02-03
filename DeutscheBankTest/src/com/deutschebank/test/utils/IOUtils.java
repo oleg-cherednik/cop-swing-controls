@@ -28,6 +28,8 @@ public final class IOUtils {
 	 * @throws FileNotFoundException
 	 */
 	public static InputData readInXML(File file) throws FileNotFoundException {
+		assert file != null;
+
 		FileInputStream in = null;
 
 		try {
@@ -59,6 +61,15 @@ public final class IOUtils {
 		} finally {
 			close(out);
 		}
+	}
+
+	public static String toXML(InputData data) {
+		assert data != null;
+
+		XStream xstream = createParser();
+		InputData.process(xstream);
+
+		return xstream.toXML(data);
 	}
 
 	private static XStream createParser() {

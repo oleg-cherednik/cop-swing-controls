@@ -1,6 +1,5 @@
 package com.deutschebank.test.files;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -17,7 +16,6 @@ import com.deutschebank.test.xml.PathTag;
  * @since 02.02.2013
  */
 public final class Result {
-	private final Map<String, Set<String>> map;
 	private final OutputData outputData;
 
 	public static Builder createBuilder() {
@@ -25,15 +23,10 @@ public final class Result {
 	}
 
 	private Result(Builder builder) {
-		map = builder.getMap();
 		outputData = builder.getXml();
 	}
 
-	public Map<String, Set<String>> getData() {
-		return map;
-	}
-
-	public OutputData getXml() {
+	public OutputData getOutputData() {
 		return outputData;
 	}
 
@@ -60,10 +53,6 @@ public final class Result {
 
 				files.add(file);
 			}
-		}
-
-		private Map<String, Set<String>> getMap() {
-			return map.isEmpty() ? Collections.<String, Set<String>> emptyMap() : Collections.unmodifiableMap(map);
 		}
 
 		private OutputData getXml() {

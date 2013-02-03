@@ -40,22 +40,14 @@ public class Main {
 	 */
 	public static void main(String... args) {
 		try {
-			Result res = new Main(args).proceed();
+			Main mainModule = new Main(args);
+			Result res = mainModule.proceed();
 
 			System.out.println(LINE);
 
-			System.out.println("Time: " + Statistics.getInstance().getTotalWorkTime() + " sec.");
-			System.out.println("\nResults (textPattern - files amount):");
-
-			for (Map.Entry<String, Set<String>> entry : res.getData().entrySet()) {
-				String textPattern = entry.getKey();
-				Set<String> files = entry.getValue();
-
-				System.out.print(Statistics.isEmpty(textPattern) ? "<no pattern>" : textPattern);
-				System.out.println(" - " + files.size());
-			}
-
-			System.out.println("\nTotal files searched: " + Statistics.getInstance().getScannedFiles());
+			System.out.println(IOUtils.toXML(mainModule.inputData));
+			System.out.println("\nTime: " + Statistics.getInstance().getTotalWorkTime() + " sec.");
+			System.out.println("Total files searched: " + Statistics.getInstance().getScannedFiles());
 			System.out.println("Total folders searched: " + Statistics.getInstance().getScannedFolders());
 			System.out.println("Average task delay: " + Statistics.getInstance().getAverageDelay() + " sec.");
 			System.out.println("Average task work: " + Statistics.getInstance().getAverageWork() + " sec.");

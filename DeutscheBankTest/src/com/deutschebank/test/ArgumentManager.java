@@ -86,7 +86,7 @@ public final class ArgumentManager {
 		File file = new File(arg);
 
 		synchronized (lock) {
-			IOUtils.writeOutXML(builder.createResult().getXml(), file);
+			IOUtils.writeOutXML(builder.createResult().getOutputData(), file);
 		}
 	}
 
