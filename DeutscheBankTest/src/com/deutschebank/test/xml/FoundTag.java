@@ -47,7 +47,7 @@ public class FoundTag implements Comparable<FoundTag> {
 	}
 
 	public Set<PathTag> getTasks() {
-		return (paths == null || paths.isEmpty()) ? Collections.<PathTag> emptySet() : paths;
+		return Statistics.isEmpty(paths) ? Collections.<PathTag> emptySet() : paths;
 	}
 
 	// ========== Comparable ==========

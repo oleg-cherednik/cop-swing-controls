@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.deutschebank.test.Statistics;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -67,7 +68,7 @@ public class InputData {
 	}
 
 	public List<TaskTag> getTasks() {
-		return (tasks == null || tasks.isEmpty()) ? Collections.<TaskTag> emptyList() : tasks;
+		return Statistics.isEmpty(tasks) ? Collections.<TaskTag> emptyList() : tasks;
 	}
 
 	// ========== static ==========

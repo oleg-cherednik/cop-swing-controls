@@ -64,7 +64,7 @@ public class Main {
 			System.out.println("Average task delay: " + Statistics.getInstance().getAverageDelay() + " sec.");
 			System.out.println("Average task work: " + Statistics.getInstance().getAverageWork() + " sec.");
 
-			ArgumentUtils.writeOutputData(res.getXml(), args);
+//			ArgumentUtils.writeOutputData(res.getXml(), args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
