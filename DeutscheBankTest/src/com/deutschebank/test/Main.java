@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import com.deutschebank.test.files.ScanManager;
 import com.deutschebank.test.files.Result;
 import com.deutschebank.test.utils.ArgumentUtils;
 import com.deutschebank.test.utils.IOUtils;

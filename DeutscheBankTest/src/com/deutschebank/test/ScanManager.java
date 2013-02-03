@@ -1,11 +1,12 @@
-package com.deutschebank.test.files;
+package com.deutschebank.test;
 
 import java.io.File;
 import java.util.Collection;
 
-import com.deutschebank.test.Statistics;
 import com.deutschebank.test.concurence.AtomicCounter;
 import com.deutschebank.test.concurence.ThreadPool;
+import com.deutschebank.test.files.Result;
+import com.deutschebank.test.files.ResultStore;
 import com.deutschebank.test.files.tasks.FindFileTask;
 import com.deutschebank.test.xml.TaskTag;
 
