@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-import com.deutschebank.test.FileType;
 import com.deutschebank.test.xml.InputData;
 import com.deutschebank.test.xml.OutputData;
 import com.thoughtworks.xstream.XStream;
@@ -32,7 +31,8 @@ public final class IOUtils {
 		FileInputStream in = null;
 
 		try {
-			XStream xstream = FileType.IN.process(createParser());
+			XStream xstream = createParser();
+			InputData.process(xstream);
 			return (InputData)xstream.fromXML(in = new FileInputStream(file));
 		} finally {
 			close(in);
@@ -50,7 +50,8 @@ public final class IOUtils {
 		FileOutputStream out = null;
 
 		try {
-			XStream xstream = FileType.OUT.process(createParser());
+			XStream xstream = createParser();
+			OutputData.process(xstream);
 			xstream.toXML(data, out = new FileOutputStream(file));
 		} finally {
 			close(out);
