@@ -138,7 +138,7 @@ public final class Statistics {
 	// ========== static ==========
 
 	private static double round3(double value) {
-		return (Math.floor(value * 1000) + 1) / 1000;
+		return Math.floor(value * 1000 + 0.5) / 1000;
 	}
 
 	public static boolean isEmpty(String str) {
