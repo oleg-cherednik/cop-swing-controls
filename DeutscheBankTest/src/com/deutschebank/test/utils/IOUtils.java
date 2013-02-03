@@ -29,6 +29,8 @@ public final class IOUtils {
 	 */
 	public static InputData readInXML(File file) throws FileNotFoundException {
 		assert file != null;
+		
+		System.out.println("Read input file: " + file);
 
 		FileInputStream in = null;
 

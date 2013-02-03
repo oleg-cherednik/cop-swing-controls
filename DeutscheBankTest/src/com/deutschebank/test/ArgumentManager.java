@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import com.deutschebank.test.files.Result;
 import com.deutschebank.test.utils.IOUtils;
 import com.deutschebank.test.xml.InputData;
 import com.deutschebank.test.xml.OutputData;
+import com.deutschebank.test.xml.TaskTag;
 
 /**
  * @author Oleg Cherednik
@@ -47,15 +47,7 @@ public final class ArgumentManager {
 	 */
 	public InputData readInputData() throws FileNotFoundException {
 		String arg = getArgument(0);
-
-		if (arg == null)
-			return null;
-
-		File file = new File(arg);
-
-		System.out.println("Read input file: " + file);
-
-		return IOUtils.readInXML(file);
+		return (arg == null) ? getDefaultInputData() : IOUtils.readInXML(new File(arg));
 	}
 
 	/**
@@ -88,5 +80,17 @@ public final class ArgumentManager {
 		synchronized (lock) {
 			IOUtils.writeOutXML(builder.createResult().getOutputData(), file);
 		}
+	}
+
+	// ========== static ==========
+
+	private static InputData getDefaultInputData() {
+		InputData data = new InputData();
+
+		data.setThreads(8);
+		data.setOutToConsole(true);
+		data.addTask(new TaskTag("c:\\", "*.txt"));
+
+		return data;
 	}
 }

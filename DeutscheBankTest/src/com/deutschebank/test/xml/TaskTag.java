@@ -15,6 +15,13 @@ public class TaskTag {
 	public static final String FILE_PATTERN = "filePattern";
 	public static final String TEXT_PATTERN = "textPattern";
 
+	public TaskTag() {}
+
+	public TaskTag(String root, String filePattern) {
+		setRoot(root);
+		setFilePattern(filePattern);
+	}
+
 	@XStreamAlias(ROOT)
 	@XStreamAsAttribute
 	private String root;
