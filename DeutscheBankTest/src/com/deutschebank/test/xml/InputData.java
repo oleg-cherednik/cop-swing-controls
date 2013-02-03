@@ -18,7 +18,9 @@ public class InputData {
 	public static final String TITLE = "input";
 	public static final String THREADS = "threads";
 	public static final String CONSOLE = "outToConsole";
+	public static final String UP_TO_DATE_OUTPUT = "upToDateOutput";
 
+	/** Threads amount to create */
 	@XStreamAlias(THREADS)
 	@XStreamAsAttribute
 	private int threads;
@@ -26,6 +28,10 @@ public class InputData {
 	@XStreamAlias(CONSOLE)
 	@XStreamAsAttribute
 	private boolean outToConsole;
+
+	@XStreamAlias(UP_TO_DATE_OUTPUT)
+	@XStreamAsAttribute
+	private boolean upToDateOutput;
 
 	@XStreamImplicit(itemFieldName = TaskTag.TITLE)
 	private List<TaskTag> tasks;
@@ -44,6 +50,14 @@ public class InputData {
 
 	public void setOutToConsole(boolean outToConsole) {
 		this.outToConsole = outToConsole;
+	}
+
+	public boolean isUpToDateOutput() {
+		return upToDateOutput;
+	}
+
+	public void setUpToDateOutput(boolean upToDateOutput) {
+		this.upToDateOutput = upToDateOutput;
 	}
 
 	public void addTask(TaskTag task) {
