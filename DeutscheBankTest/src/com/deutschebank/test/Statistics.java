@@ -1,5 +1,6 @@
 package com.deutschebank.test;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,9 +128,13 @@ public final class Statistics {
 	private static double round3(double value) {
 		return (Math.floor(value * 1000) + 1) / 1000;
 	}
-	
+
 	public static boolean isEmpty(String str) {
 		return str == null || str.trim().isEmpty();
+	}
+
+	public static boolean isEmpty(Collection<?> obj) {
+		return obj == null || obj.isEmpty();
 	}
 
 	// ========== inner class ==========

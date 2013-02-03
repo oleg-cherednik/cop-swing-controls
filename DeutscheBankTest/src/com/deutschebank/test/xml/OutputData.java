@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.deutschebank.test.Statistics;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -26,7 +27,7 @@ public class OutputData {
 	}
 
 	public Set<FoundTag> getResults() {
-		return (results == null || results.isEmpty()) ? Collections.<FoundTag> emptySet() : results;
+		return Statistics.isEmpty(results) ? Collections.<FoundTag> emptySet() : results;
 	}
 
 	// ========== static ==========

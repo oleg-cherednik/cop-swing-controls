@@ -16,7 +16,6 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @XStreamAlias(InputData.TITLE)
 public class InputData {
 	public static final String TITLE = "input";
-
 	public static final String THREADS = "threads";
 	public static final String CONSOLE = "outToConsole";
 

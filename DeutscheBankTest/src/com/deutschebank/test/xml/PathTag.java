@@ -16,8 +16,6 @@ public class PathTag implements Comparable<PathTag> {
 	public static final String TITLE = "path";
 	public static final String PATH = "path2";
 
-	// @XStreamAlias(PATH)
-	// @XStreamConverter(StringConverter.class)
 	private String path;
 
 	public PathTag() {}
