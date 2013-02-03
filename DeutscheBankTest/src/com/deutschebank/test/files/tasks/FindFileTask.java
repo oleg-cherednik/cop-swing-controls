@@ -36,11 +36,11 @@ public final class FindFileTask extends FileTask {
 	public FindFileTask(String rootPath, String fileNameRegex, String textSearchRegex, ThreadPool pool, ResultStore out) {
 		super(getId(rootPath, fileNameRegex), out);
 
-		assert rootPath != null && !rootPath.isEmpty();
+		assert !Statistics.isEmpty(rootPath);
 
 		this.rootPath = rootPath;
-		this.fileNameRegex = (fileNameRegex == null || fileNameRegex.isEmpty()) ? null : fileNameRegex;
-		this.textSearchRegex = (textSearchRegex == null || textSearchRegex.isEmpty()) ? null : textSearchRegex;
+		this.fileNameRegex = Statistics.isEmpty(fileNameRegex) ? null : fileNameRegex;
+		this.textSearchRegex = Statistics.isEmpty(textSearchRegex) ? null : textSearchRegex;
 		this.pool = pool;
 	}
 

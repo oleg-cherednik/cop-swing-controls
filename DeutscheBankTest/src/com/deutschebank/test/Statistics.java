@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.deutschebank.test.concurence.AtomicCounter;
-import com.deutschebank.test.utils.IOUtils;
 import com.deutschebank.test.xml.InputData;
 
 /**

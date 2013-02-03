@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 
+import com.deutschebank.test.Statistics;
 import com.deutschebank.test.files.ResultStore;
 
 /**
@@ -30,7 +31,7 @@ final class FindTextInFileTask extends FileTask {
 		super(getId(file, regex), out);
 
 		assert file != null && file.isFile();
-		assert regex != null && !regex.trim().isEmpty();
+		assert !Statistics.isEmpty(regex);
 		assert out != null;
 
 		this.file = file;
@@ -67,7 +68,7 @@ final class FindTextInFileTask extends FileTask {
 				try {
 					in.close();
 					in = null;
-				} catch (IOException e) {}
+				} catch (IOException ignored) {}
 			}
 		}
 	}

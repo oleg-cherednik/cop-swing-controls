@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.deutschebank.test.files.Result;
-import com.deutschebank.test.utils.IOUtils;
 import com.deutschebank.test.xml.InputData;
 import com.deutschebank.test.xml.OutputData;
 import com.deutschebank.test.xml.TaskTag;
