@@ -23,7 +23,7 @@ public final class ScanManager implements ResultStore {
 	private final ThreadPool pool;
 	/** Print fined files to console */
 	private final boolean outToConsole;
-	/** Keep putput file uptodate, write on the fly */
+	/** Keep output file up-to-date, write on the fly */
 	private final boolean upToDateOutput;
 	/** Result store */
 	private final Result.Builder builder = Result.createBuilder();
@@ -46,7 +46,7 @@ public final class ScanManager implements ResultStore {
 	}
 
 	public Result proceed(Collection<TaskTag> tasks) throws Exception {
-		if (tasks == null || tasks.isEmpty())
+		if (Statistics.isEmpty(tasks))
 			return Result.createBuilder().createResult();
 
 		for (TaskTag task : tasks)

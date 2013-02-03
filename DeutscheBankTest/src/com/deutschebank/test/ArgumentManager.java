@@ -49,7 +49,7 @@ public final class ArgumentManager {
 		String arg = getArgument(0);
 
 		if (arg == null)
-			return askForInputData();
+			return null;
 
 		File file = new File(arg);
 
@@ -88,24 +88,5 @@ public final class ArgumentManager {
 		synchronized (lock) {
 			IOUtils.writeOutXML(builder.createResult().getOutputData(), file);
 		}
-	}
-
-	private static InputData askForInputData() {
-		Scanner in = null;
-
-		try {
-			in = new Scanner(System.in);
-
-			// for (int i = 0, size = arguments.length; i < size; i++)
-			// arguments[i].askArgument(in);
-
-			return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			in.close();
-		}
-
-		return null;
 	}
 }

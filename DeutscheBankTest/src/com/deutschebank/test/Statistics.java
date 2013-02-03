@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.deutschebank.test.concurence.AtomicCounter;
+import com.deutschebank.test.utils.IOUtils;
+import com.deutschebank.test.xml.InputData;
 
 /**
  * Statistics module. It collects statistics information. Thread safe.
@@ -121,6 +123,17 @@ public final class Statistics {
 
 		if (entry != null)
 			entry.accomplished = System.currentTimeMillis();
+	}
+
+	public void print(InputData inputData) {
+		System.out.println("-----------------------");
+
+		System.out.println(IOUtils.toXML(inputData));
+		System.out.println("\nTime: " + getTotalWorkTime() + " sec.");
+		System.out.println("Total files searched: " + getScannedFiles());
+		System.out.println("Total folders searched: " + getScannedFolders());
+		System.out.println("Average task delay: " + getAverageDelay() + " sec.");
+		System.out.println("Average task work: " + getAverageWork() + " sec.");
 	}
 
 	// ========== static ==========
