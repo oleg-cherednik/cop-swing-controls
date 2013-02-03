@@ -3,6 +3,7 @@ package com.deutschebank.test.files;
 import java.io.File;
 import java.util.Collection;
 
+import com.deutschebank.test.Statistics;
 import com.deutschebank.test.concurence.AtomicCounter;
 import com.deutschebank.test.concurence.ThreadPool;
 import com.deutschebank.test.files.tasks.FindFileTask;
@@ -67,7 +68,7 @@ public final class ScanManager implements ResultStore {
 		String textSearchRegex = task.getTextPattern();
 
 		pool.execute(new FindFileTask(rootPath, fileNameRegex, textSearchRegex, pool, this));
-		builder.addTotalFolders(1);
+		Statistics.getInstance().addScannedFolders(1);
 	}
 
 	// ========== ResultListener ==========
@@ -85,14 +86,6 @@ public final class ScanManager implements ResultStore {
 			System.out.println(file);
 
 		builder.addFile(file);
-	}
-
-	public void addTotalFiles(int totalFiles) {
-		builder.addTotalFiles(totalFiles);
-	}
-
-	public void addTotalFolders(int totalFolders) {
-		builder.addTotalFolders(totalFolders);
 	}
 
 	// ========== static ==========

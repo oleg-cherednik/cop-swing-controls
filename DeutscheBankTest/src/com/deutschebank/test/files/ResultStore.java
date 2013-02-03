@@ -10,8 +10,4 @@ public interface ResultStore {
 	void decRunningTasksAmount();
 
 	void addFile(String regex, String file);
-
-	void addTotalFiles(int totalFiles);
-
-	void addTotalFolders(int totalFolders);
 }

@@ -2,6 +2,7 @@ package com.deutschebank.test.files.tasks;
 
 import java.io.File;
 
+import com.deutschebank.test.Statistics;
 import com.deutschebank.test.concurence.ThreadPool;
 import com.deutschebank.test.files.ResultStore;
 
@@ -13,7 +14,7 @@ import com.deutschebank.test.files.ResultStore;
  * @author Oleg Cherednik
  * @since 02.02.2013
  */
-public final class FindFileTask extends AbstractFileTask {
+public final class FindFileTask extends FileTask {
 	/**
 	 * Root path. If it's field with valid name or directory then this task will be run in parallel thread.
 	 */
@@ -32,9 +33,8 @@ public final class FindFileTask extends AbstractFileTask {
 	 * @param resultBuilder result store
 	 * @param pool thread pool to add new tasks
 	 */
-	public FindFileTask(String rootPath, String fileNameRegex, String textSearchRegex, ThreadPool pool,
-			ResultStore out) {
-		super(out);
+	public FindFileTask(String rootPath, String fileNameRegex, String textSearchRegex, ThreadPool pool, ResultStore out) {
+		super(getId(rootPath, fileNameRegex), out);
 
 		assert rootPath != null && !rootPath.isEmpty();
 
@@ -90,8 +90,13 @@ public final class FindFileTask extends AbstractFileTask {
 			}
 		}
 
-		// store statistics
-		out.addTotalFiles(files);
-		out.addTotalFolders(folders);
+		Statistics.getInstance().addScannedFiles(files);
+		Statistics.getInstance().addScannedFolders(folders);
+	}
+
+	// ========== static ==========
+
+	private static final String getId(String root, String filePattern) {
+		return FindFileTask.class.getSimpleName() + ':' + root + ':' + filePattern;
 	}
 }

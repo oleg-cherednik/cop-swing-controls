@@ -14,7 +14,7 @@ import com.deutschebank.test.files.ResultStore;
  * @author Oleg Cherednik
  * @since 02.02.2013
  */
-final class FindTextInFileTask extends AbstractFileTask {
+final class FindTextInFileTask extends FileTask {
 	/** File reference */
 	private final File file;
 	/** Regex pattern to search */
@@ -27,7 +27,7 @@ final class FindTextInFileTask extends AbstractFileTask {
 	 * @throws IllegalArgumentException if {@link #file} is not a file
 	 */
 	public FindTextInFileTask(File file, String regex, ResultStore out) {
-		super(out);
+		super(getId(file, regex), out);
 
 		assert file != null && file.isFile();
 		assert regex != null && !regex.trim().isEmpty();
@@ -70,5 +70,11 @@ final class FindTextInFileTask extends AbstractFileTask {
 				} catch (IOException e) {}
 			}
 		}
+	}
+
+	// ========== static ==========
+
+	private static final String getId(File file, String textPattern) {
+		return FindTextInFileTask.class.getSimpleName() + ':' + file.getAbsolutePath() + ':' + textPattern;
 	}
 }

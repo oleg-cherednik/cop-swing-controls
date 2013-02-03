@@ -41,16 +41,18 @@ public class Main {
 	public static void main(String... args) {
 		try {
 			Main module = new Main(args);
-			long timeIn = System.currentTimeMillis();
+			Statistics.getInstance().started();
 			Result res = module.proceed();
-			long timeOut = System.currentTimeMillis();
+			Statistics.getInstance().accomplished();
 
 			System.out.println(LINE);
 
-			System.out.println("Time: " + ((timeOut - timeIn) / 1000) + " sec.");
+			System.out.println("Time: " + Statistics.getInstance().getTotalWorkTime() + " sec.");
 			System.out.println("Total files found: " + res.getResultFiles().size());
-			System.out.println("Total files searched: " + res.getTotalFiles());
-			System.out.println("Total folders searched: " + res.getTotalFolders());
+			System.out.println("Total files searched: " + Statistics.getInstance().getScannedFiles());
+			System.out.println("Total folders searched: " + Statistics.getInstance().getScannedFolders());
+			System.out.println("Average task delay: " + Statistics.getInstance().getAverageDelay() + " sec.");
+			System.out.println("Average task work: " + Statistics.getInstance().getAverageWork() + " sec.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -83,6 +85,7 @@ public class Main {
 			e.printStackTrace();
 		} finally {
 			scanManager.dispose();
+			// Statistics.getInstance().dispose();
 			scanManager = null;
 		}
 
