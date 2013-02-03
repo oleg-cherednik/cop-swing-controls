@@ -1,18 +1,19 @@
-package com.deutschebank.test;
+package com.deutschebank.test.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import com.deutschebank.test.utils.IOUtils;
 import com.deutschebank.test.xml.InputData;
 import com.deutschebank.test.xml.OutputData;
 
 /**
+ * Utilities to work with command line and input argument array.
+ * 
  * @author Oleg Cherednik
  * @since 02.02.2013
  */
-final class ArgumentUtils {
+public final class ArgumentUtils {
 	private ArgumentUtils() {}
 
 	public static InputData readInputData(String... args) throws FileNotFoundException {

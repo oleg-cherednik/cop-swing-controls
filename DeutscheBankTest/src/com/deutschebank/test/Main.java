@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.deutschebank.test.files.ScanManager;
 import com.deutschebank.test.files.Result;
+import com.deutschebank.test.utils.ArgumentUtils;
 import com.deutschebank.test.utils.IOUtils;
 import com.deutschebank.test.xml.InputData;
 import com.thoughtworks.xstream.XStream;
@@ -62,7 +63,7 @@ public class Main {
 			System.out.println("Total folders searched: " + Statistics.getInstance().getScannedFolders());
 			System.out.println("Average task delay: " + Statistics.getInstance().getAverageDelay() + " sec.");
 			System.out.println("Average task work: " + Statistics.getInstance().getAverageWork() + " sec.");
-			
+
 			ArgumentUtils.writeOutputData(res.getXml(), args);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -71,12 +72,6 @@ public class Main {
 
 	public Main(String... args) throws Exception {
 		inputData = ArgumentUtils.readInputData(args);
-
-		// readArguments(args);
-		// if (args.length < 4)
-		// askForMissingArguments();
-		//
-		// printArguments();
 	}
 
 	public Result proceed() {
