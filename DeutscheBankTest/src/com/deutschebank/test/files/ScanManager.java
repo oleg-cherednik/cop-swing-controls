@@ -83,9 +83,9 @@ public final class ScanManager implements ResultStore {
 
 	public void addFile(String textPattern, String file) {
 		if (outToConsole)
-			System.out.println(file);
+			System.out.println((Statistics.isEmpty(textPattern) ? "" : textPattern + " - ") + file);
 
-		builder.addFile(file);
+		builder.addFile(textPattern, file);
 	}
 
 	// ========== static ==========

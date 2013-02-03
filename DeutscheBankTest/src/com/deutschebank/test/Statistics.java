@@ -7,16 +7,24 @@ import java.util.Map;
 import com.deutschebank.test.concurence.AtomicCounter;
 
 /**
+ * Statistics module. It collects statistics information. Thread safe.
+ * 
  * @author Oleg Cherednik
  * @since 02.02.2013
  */
 public final class Statistics {
 	private static final Statistics INSTANCE = new Statistics();
 
+	/** Started time (ms) */
 	private long started;
+	/** Accomplished time (ms) */
 	private long accomplished;
+
+	/** Amount of scanned file */
 	private final AtomicCounter scannedFiles = new AtomicCounter();
+	/** Amount of scanned folders */
 	private final AtomicCounter scannedFolders = new AtomicCounter();
+	/** Each task (or thread) is placed in this map */
 	private final Map<String, Entry> entries = Collections.synchronizedMap(new HashMap<String, Entry>());
 
 	public static Statistics getInstance() {
@@ -33,7 +41,11 @@ public final class Statistics {
 		accomplished = System.currentTimeMillis();
 	}
 
-	// in sec.
+	/**
+	 * Returns total work time of all process
+	 * 
+	 * @return time in sec.
+	 */
 	public double getTotalWorkTime() {
 		return round3((accomplished - started) / 1000);
 	}
@@ -42,6 +54,11 @@ public final class Statistics {
 		this.scannedFiles.add(scannedFiles);
 	}
 
+	/**
+	 * Returns total scanned files
+	 * 
+	 * @return scanned files amount
+	 */
 	public int getScannedFiles() {
 		return scannedFiles.getValue();
 	}
@@ -50,11 +67,20 @@ public final class Statistics {
 		this.scannedFolders.add(scannedFolders);
 	}
 
+	/**
+	 * Returns total scanned folders
+	 * 
+	 * @return scanned folders amount
+	 */
 	public int getScannedFolders() {
 		return scannedFolders.getValue();
 	}
 
-	// in sec.
+	/**
+	 * Return averaged task delay time. This time is the period between task started and task created times.
+	 * 
+	 * @return average task delay time in sec.
+	 */
 	public double getAverageDelay() {
 		double sum = 0;
 
@@ -64,7 +90,11 @@ public final class Statistics {
 		return round3(sum / entries.size() / 1000);
 	}
 
-	// in sec.
+	/**
+	 * Return averaged task work time. This time is the period between task accomplished and task started times.
+	 * 
+	 * @return average task work time in sec.
+	 */
 	public double getAverageWork() {
 		double sum = 0;
 
@@ -97,12 +127,19 @@ public final class Statistics {
 	private static double round3(double value) {
 		return (Math.floor(value * 1000) + 1) / 1000;
 	}
+	
+	public static boolean isEmpty(String str) {
+		return str == null || str.trim().isEmpty();
+	}
 
 	// ========== inner class ==========
 
 	private static class Entry {
+		/** Created time (ms) */
 		public final long created = System.currentTimeMillis();
+		/** Start time (ms) */
 		public long started;
+		/** Accomplished time (ms) */
 		public long accomplished;
 	}
 }

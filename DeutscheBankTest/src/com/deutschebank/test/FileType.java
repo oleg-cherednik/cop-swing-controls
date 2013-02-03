@@ -1,6 +1,7 @@
 ﻿package com.deutschebank.test;
 
 import com.deutschebank.test.xml.InputData;
+import com.deutschebank.test.xml.OutputData;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -18,7 +19,7 @@ public enum FileType {
 	OUT {
 		@Override
 		public XStream process(XStream xstream) {
-			// DictionaryTag.process(xstream);
+			OutputData.process(xstream);
 			return xstream;
 		}
 	};

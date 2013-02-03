@@ -2,7 +2,9 @@ package com.deutschebank.test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import com.deutschebank.test.files.ScanManager;
 import com.deutschebank.test.files.Result;
@@ -40,26 +42,34 @@ public class Main {
 	 */
 	public static void main(String... args) {
 		try {
-			Main module = new Main(args);
-			Statistics.getInstance().started();
-			Result res = module.proceed();
-			Statistics.getInstance().accomplished();
+			Result res = new Main(args).proceed();
 
 			System.out.println(LINE);
 
 			System.out.println("Time: " + Statistics.getInstance().getTotalWorkTime() + " sec.");
-			System.out.println("Total files found: " + res.getResultFiles().size());
-			System.out.println("Total files searched: " + Statistics.getInstance().getScannedFiles());
+			System.out.println("\nResults (textPattern - files amount):");
+
+			for (Map.Entry<String, Set<String>> entry : res.getData().entrySet()) {
+				String textPattern = entry.getKey();
+				Set<String> files = entry.getValue();
+
+				System.out.print(Statistics.isEmpty(textPattern) ? "<no pattern>" : textPattern);
+				System.out.println(" - " + files.size());
+			}
+
+			System.out.println("\nTotal files searched: " + Statistics.getInstance().getScannedFiles());
 			System.out.println("Total folders searched: " + Statistics.getInstance().getScannedFolders());
 			System.out.println("Average task delay: " + Statistics.getInstance().getAverageDelay() + " sec.");
 			System.out.println("Average task work: " + Statistics.getInstance().getAverageWork() + " sec.");
+			
+			ArgumentUtils.writeOutputData(res.getXml(), args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public Main(String... args) throws Exception {
-		inputData = ArgumentUtils.getInputData(args);
+		inputData = ArgumentUtils.readInputData(args);
 
 		// readArguments(args);
 		// if (args.length < 4)
@@ -69,6 +79,8 @@ public class Main {
 	}
 
 	public Result proceed() {
+		Statistics.getInstance().started();
+
 		int nThreads = inputData.getThreads();
 		boolean outToConsole = inputData.isOutToConsole();
 		ScanManager scanManager = new ScanManager(nThreads, outToConsole);
@@ -84,8 +96,8 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			Statistics.getInstance().accomplished();
 			scanManager.dispose();
-			// Statistics.getInstance().dispose();
 			scanManager = null;
 		}
 
@@ -93,7 +105,7 @@ public class Main {
 	}
 
 	private void readArguments(String... args) throws FileNotFoundException {
-		InputData data = FormReader.readDataXML(new File(args[0]));
+		InputData data = FormReader.readInXML(new File(args[0]));
 
 		if (args != null && args.length != 0)
 			for (int i = 0, size = args.length; i < size; i++)

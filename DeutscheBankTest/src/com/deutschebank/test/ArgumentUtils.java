@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import com.deutschebank.test.xml.InputData;
+import com.deutschebank.test.xml.OutputData;
 
 /**
  * @author Oleg Cherednik
@@ -13,18 +14,28 @@ import com.deutschebank.test.xml.InputData;
 final class ArgumentUtils {
 	private ArgumentUtils() {}
 
-	public static InputData getInputData(String... args) throws FileNotFoundException {
-		if (args != null && args.length == 1) {
+	public static InputData readInputData(String... args) throws FileNotFoundException {
+		if (args != null && args.length >= 1) {
 			File file = new File(args[0]);
 
 			System.out.println("Read input file: " + file);
 
-			return FormReader.readDataXML(file);
+			return FormReader.readInXML(file);
 		}
 
 		System.out.println("Input file not found");
 
 		return askForInputData();
+	}
+
+	public static void writeOutputData(OutputData data, String... args) throws FileNotFoundException {
+		if (args != null && args.length >= 2) {
+			File file = new File(args[1]);
+
+			System.out.println("Write output file: " + file);
+			FormReader.writeOutXML(data, file);
+		} else
+			System.err.println("Output file not set");
 	}
 
 	private static InputData askForInputData() {
