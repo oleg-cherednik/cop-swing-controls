@@ -60,8 +60,11 @@ public class MainModule {
 		URL url = MainModule.class.getResource("MainModule.class");
 		File f = new File(url.toURI());
 		File parentFile = f.getParentFile();
-		String p = url.toURI().getPath();
 		boolean isFile = jarFile.isFile();
+
+		String classPath = jarFile.getPath();
+		String className = MainModule.class.getName();
+		
 		String jarDir = isFile ? jarFile.getPath() : f.getPath();
 
 		System.out.println(jarDir);
@@ -83,6 +86,8 @@ public class MainModule {
 
 		// The argument to the batch file.
 		// final String argument = "Albert Attard";
+		
+		
 
 		// Create the process
 		// final ProcessBuilder processBuilder = new
@@ -90,7 +95,7 @@ public class MainModule {
 		// final ProcessBuilder processBuilder = new ProcessBuilder("java",
 		// "-jar", jarDir, "" + (id + 1));
 //		final ProcessBuilder processBuilder = new ProcessBuilder("java", "-classpath", jarDir, "" + (id + 1));
-		final ProcessBuilder processBuilder = new ProcessBuilder("java", "-classpath", jarFile.getPath(), jarDir, "" + (id + 1));
+		final ProcessBuilder processBuilder = new ProcessBuilder("java", "-classpath", classPath, className, "" + (id + 1));
 		// Redirect any output (including error) to a file. This avoids
 		// deadlocks
 		// when the buffers get full.
