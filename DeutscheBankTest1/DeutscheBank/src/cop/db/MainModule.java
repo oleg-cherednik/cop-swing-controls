@@ -1,6 +1,8 @@
 package cop.db;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.security.CodeSource;
 
 public class MainModule {
@@ -51,11 +53,16 @@ public class MainModule {
 
 	public static void main(String[] args) throws Exception {
 		int id = Integer.parseInt(args[0]);
-		
+
 		System.out.println("id: " + id + " - start main module");
 		CodeSource codeSource = MainModule.class.getProtectionDomain().getCodeSource();
 		File jarFile = new File(codeSource.getLocation().toURI().getPath());
-		String jarDir = jarFile.getPath();
+		URL url = MainModule.class.getResource("MainModule.class");
+		File f = new File(url.toURI());
+		File parentFile = f.getParentFile();
+		String p = url.toURI().getPath();
+		boolean isFile = jarFile.isFile();
+		String jarDir = isFile ? jarFile.getPath() : f.getPath();
 
 		System.out.println(jarDir);
 
@@ -65,23 +72,25 @@ public class MainModule {
 		}
 
 		// The batch file to execute
-//		final File batchFile = new File("d:\\db\\run.bat");// "batch\\process.bat");
+		// final File batchFile = new File("d:\\db\\run.bat");//
+		// "batch\\process.bat");
 
 		// The output file. All activity is written to this file
-		final File outputFile = new File(String.format("d:\\db\\out.txt", /*
-																		 * "output\\output_%tY%<tm%<td_%<tH%<tM%<tS.txt"
-																		 * ,
-																		 */
-				System.currentTimeMillis()));
+
+		// java -classpath my_class.class
+
+		final File outputFile = new File(String.format("d:\\db\\out.txt", System.currentTimeMillis()));
 
 		// The argument to the batch file.
-//		final String argument = "Albert Attard";
+		// final String argument = "Albert Attard";
 
 		// Create the process
 		// final ProcessBuilder processBuilder = new
 		// ProcessBuilder(batchFile.getAbsolutePath(), argument);
-		final ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", jarDir, "" + (id + 1));// batchFile.getAbsolutePath(),
-																								// argument);
+		// final ProcessBuilder processBuilder = new ProcessBuilder("java",
+		// "-jar", jarDir, "" + (id + 1));
+//		final ProcessBuilder processBuilder = new ProcessBuilder("java", "-classpath", jarDir, "" + (id + 1));
+		final ProcessBuilder processBuilder = new ProcessBuilder("java", "-classpath", jarFile.getPath(), jarDir, "" + (id + 1));
 		// Redirect any output (including error) to a file. This avoids
 		// deadlocks
 		// when the buffers get full.
@@ -89,8 +98,9 @@ public class MainModule {
 		processBuilder.redirectOutput(outputFile);
 
 		// Add a new environment variable
-//		processBuilder.environment().put("message", "Example of process builder");
-//		processBuilder.environment().put("id", "1");
+		// processBuilder.environment().put("message",
+		// "Example of process builder");
+		// processBuilder.environment().put("id", "1");
 
 		// Set the working directory. The batch file will run as if you are in
 		// this
