@@ -1,7 +1,7 @@
 package cop.db;
 
 import java.io.File;
-import java.io.IOException;
+import java.security.CodeSource;
 
 public class MainModule {
 	// private MainModule(int i) {
@@ -50,6 +50,12 @@ public class MainModule {
 	// ========== static ==========
 
 	public static void main(String[] args) throws Exception {
+		CodeSource codeSource = MainModule.class.getProtectionDomain().getCodeSource();
+		File jarFile = new File(codeSource.getLocation().toURI().getPath());
+		String jarDir = jarFile.getPath();
+		
+		System.out.println(jarDir);
+		
 		System.out.println("MainModule: " + args[0]);
 		// The batch file to execute
 		final File batchFile = new File("d:\\db\\run.bat");// "batch\\process.bat");
@@ -65,8 +71,10 @@ public class MainModule {
 		final String argument = "Albert Attard";
 
 		// Create the process
-//		final ProcessBuilder processBuilder = new ProcessBuilder(batchFile.getAbsolutePath(), argument);
-		final ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", "d:\\db\\db.jar", "1");//batchFile.getAbsolutePath(), argument);
+		// final ProcessBuilder processBuilder = new
+		// ProcessBuilder(batchFile.getAbsolutePath(), argument);
+		final ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", "d:\\db\\db.jar", "1");// batchFile.getAbsolutePath(),
+																										// argument);
 		// Redirect any output (including error) to a file. This avoids
 		// deadlocks
 		// when the buffers get full.
