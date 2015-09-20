@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<input threads="10" outToConsole="true" upToDateOutput="true">
-	<task root="c:\" filePattern="*.txt" textPattern="java" />
-	<task root="c:\" filePattern="*.txt" textPattern="info" />
-</input>
